@@ -143,11 +143,13 @@ public class GenericCollectFsmBuilder {
         this.builder.onEntry(GenericCollectState.FAILED).callMethod("enterFailed");
     }
 
-    public GenericCollectFsm build(DtmfDetector detector, Player player, AsrEngine asrEngine, GenericCollectFsmImpl.CollectStateHandlerExt handlerExt, MgcpEventSubject eventSubject, ListeningScheduledExecutorService scheduler,
+    public GenericCollectFsm build(DtmfDetector detector, Player player, AsrEngine asrEngine,
+                                   GenericCollectFsmImpl.CollectStateHandlerExt handlerExt,
+                                   MgcpEventSubject eventSubject, ListeningScheduledExecutorService scheduler,
                                    GenericCollectContext context) {
         return builder.newStateMachine(GenericCollectState.PLAY_COLLECT,
                 StateMachineConfiguration.getInstance().enableDebugMode(false), detector, player,
-                asrEngine, eventSubject, scheduler, context);
+                asrEngine, handlerExt, eventSubject, scheduler, context);
     }
 
 }
