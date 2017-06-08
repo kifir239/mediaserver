@@ -29,7 +29,9 @@ import org.restcomm.media.control.mgcp.pkg.MgcpEventSubject;
 import org.restcomm.media.control.mgcp.pkg.SignalType;
 import org.restcomm.media.control.mgcp.pkg.au.*;
 import org.restcomm.media.control.mgcp.pkg.generic.collect.*;
+import org.restcomm.media.resource.player.audio.AudioPlayerEvent;
 import org.restcomm.media.spi.dtmf.DtmfDetector;
+import org.restcomm.media.spi.dtmf.DtmfEvent;
 import org.restcomm.media.spi.player.Player;
 
 import java.util.Map;
@@ -72,6 +74,14 @@ public class PlayCollect extends AbstractMgcpSignal {
 
     public PlayCollect(Player player, DtmfDetector detector, int requestId, Map<String, String> parameters, ListeningScheduledExecutorService executor) {
         this(player, detector, requestId, null, parameters, executor);
+    }
+
+    public void process(final DtmfEvent event) {
+        fsm.getDetectorListener().process(event);
+    }
+
+    public void process(final AudioPlayerEvent event) {
+        fsm.getPlayerListener().process(event);
     }
 
     @Override
@@ -366,7 +376,7 @@ public class PlayCollect extends AbstractMgcpSignal {
          * @return
          */
         public int getExtraDigitTimer() {
-            String value = Optional.fromNullable(getParameter(SignalParameters.EXTRA_DIGIT_TIMER.symbol())).or("");
+            String value = Optional.fromNullable(getParameter(SignalParameters.EXTRA_DIGIT_TIMER.symbol())).or("0");
             return Integer.parseInt(value) * 100;
         }
 

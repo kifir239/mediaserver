@@ -21,6 +21,8 @@
 
 package org.restcomm.media.control.mgcp.pkg.generic.collect;
 
+import org.restcomm.media.spi.dtmf.DtmfDetectorListener;
+import org.restcomm.media.spi.player.PlayerListener;
 import org.squirrelframework.foundation.fsm.StateMachine;
 
 /**
@@ -28,7 +30,9 @@ import org.squirrelframework.foundation.fsm.StateMachine;
  *
  */
 public interface GenericCollectFsm extends StateMachine<GenericCollectFsm, GenericCollectState, GenericCollectEvent, GenericCollectContext> {
+    DtmfDetectorListener getDetectorListener();
 
+    PlayerListener getPlayerListener();
     
     void enterPlayCollect(GenericCollectState from, GenericCollectState to, GenericCollectEvent event, GenericCollectContext context);
 

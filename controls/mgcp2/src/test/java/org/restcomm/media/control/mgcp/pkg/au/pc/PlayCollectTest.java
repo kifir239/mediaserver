@@ -93,8 +93,8 @@ public class PlayCollectTest {
         pc.observe(observer);
         pc.execute();
 
-        pc.detectorListener.process(new DtmfEventImpl(detector, "5", -30));
-        pc.detectorListener.process(new DtmfEventImpl(detector, "#", -30));
+        pc.process(new DtmfEventImpl(detector, "5", -30));
+        pc.process(new DtmfEventImpl(detector, "#", -30));
 
         // then
         verify(detector, times(1)).activate();
@@ -129,9 +129,9 @@ public class PlayCollectTest {
         pc.observe(observer);
         pc.execute();
 
-        pc.detectorListener.process(new DtmfEventImpl(detector, "5", -30));
+        pc.process(new DtmfEventImpl(detector, "5", -30));
         verify(player, times(1)).deactivate();
-        pc.detectorListener.process(new DtmfEventImpl(detector, "5", -30));
+        pc.process(new DtmfEventImpl(detector, "5", -30));
 
         // then
 
@@ -169,9 +169,9 @@ public class PlayCollectTest {
         pc.observe(observer);
         pc.execute();
 
-        pc.detectorListener.process(new DtmfEventImpl(detector, "5", -30));
+        pc.process(new DtmfEventImpl(detector, "5", -30));
         verify(player, times(0)).deactivate();
-        pc.detectorListener.process(new DtmfEventImpl(detector, "#", -30));
+        pc.process(new DtmfEventImpl(detector, "#", -30));
 
         // then
         verify(detector, times(1)).activate();
@@ -206,14 +206,14 @@ public class PlayCollectTest {
         pc.observe(observer);
         pc.execute();
 
-        pc.detectorListener.process(new DtmfEventImpl(detector, "1", -30));
-        pc.detectorListener.process(new DtmfEventImpl(detector, "2", -30));
-        pc.detectorListener.process(new DtmfEventImpl(detector, "3", -30));
-        pc.detectorListener.process(new DtmfEventImpl(detector, "A", -30));
-        pc.detectorListener.process(new DtmfEventImpl(detector, "4", -30));
-        pc.detectorListener.process(new DtmfEventImpl(detector, "5", -30));
-        pc.detectorListener.process(new DtmfEventImpl(detector, "6", -30));
-        pc.detectorListener.process(new DtmfEventImpl(detector, "#", -30));
+        pc.process(new DtmfEventImpl(detector, "1", -30));
+        pc.process(new DtmfEventImpl(detector, "2", -30));
+        pc.process(new DtmfEventImpl(detector, "3", -30));
+        pc.process(new DtmfEventImpl(detector, "A", -30));
+        pc.process(new DtmfEventImpl(detector, "4", -30));
+        pc.process(new DtmfEventImpl(detector, "5", -30));
+        pc.process(new DtmfEventImpl(detector, "6", -30));
+        pc.process(new DtmfEventImpl(detector, "#", -30));
 
         // then
         verify(detector, times(2)).activate();
@@ -244,10 +244,10 @@ public class PlayCollectTest {
         pc.observe(observer);
         pc.execute();
 
-        pc.detectorListener.process(new DtmfEventImpl(detector, "1", -30));
-        pc.detectorListener.process(new DtmfEventImpl(detector, "2", -30));
-        pc.detectorListener.process(new DtmfEventImpl(detector, "3", -30));
-        pc.detectorListener.process(new DtmfEventImpl(detector, "#", -30));
+        pc.process(new DtmfEventImpl(detector, "1", -30));
+        pc.process(new DtmfEventImpl(detector, "2", -30));
+        pc.process(new DtmfEventImpl(detector, "3", -30));
+        pc.process(new DtmfEventImpl(detector, "#", -30));
 
         // then
         verify(detector, times(1)).activate();
@@ -278,9 +278,9 @@ public class PlayCollectTest {
         pc.observe(observer);
         pc.execute();
 
-        pc.detectorListener.process(new DtmfEventImpl(detector, "1", -30));
-        pc.detectorListener.process(new DtmfEventImpl(detector, "2", -30));
-        pc.detectorListener.process(new DtmfEventImpl(detector, "3", -30));
+        pc.process(new DtmfEventImpl(detector, "1", -30));
+        pc.process(new DtmfEventImpl(detector, "2", -30));
+        pc.process(new DtmfEventImpl(detector, "3", -30));
 
         // then
         verify(detector, times(1)).activate();
@@ -311,7 +311,7 @@ public class PlayCollectTest {
         pc.observe(observer);
         pc.execute();
 
-        pc.detectorListener.process(new DtmfEventImpl(detector, "6", -30));
+        pc.process(new DtmfEventImpl(detector, "6", -30));
 
         // then
         verify(detector, times(1)).activate();
@@ -341,10 +341,10 @@ public class PlayCollectTest {
         pc.observe(observer);
         pc.execute();
 
-        pc.detectorListener.process(new DtmfEventImpl(detector, "1", -30));
-        pc.detectorListener.process(new DtmfEventImpl(detector, "2", -30));
-        pc.detectorListener.process(new DtmfEventImpl(detector, "A", -30));
-        pc.detectorListener.process(new DtmfEventImpl(detector, "4", -30));
+        pc.process(new DtmfEventImpl(detector, "1", -30));
+        pc.process(new DtmfEventImpl(detector, "2", -30));
+        pc.process(new DtmfEventImpl(detector, "A", -30));
+        pc.process(new DtmfEventImpl(detector, "4", -30));
 
         // then
         verify(detector, times(1)).activate();
@@ -377,9 +377,9 @@ public class PlayCollectTest {
         pc.observe(observer);
         pc.execute();
 
-        pc.detectorListener.process(new DtmfEventImpl(detector, "1", -30));
-        pc.detectorListener.process(new DtmfEventImpl(detector, "2", -30));
-        pc.detectorListener.process(new DtmfEventImpl(detector, "#", -30));
+        pc.process(new DtmfEventImpl(detector, "1", -30));
+        pc.process(new DtmfEventImpl(detector, "2", -30));
+        pc.process(new DtmfEventImpl(detector, "#", -30));
 
         // then
         verify(detector, times(1)).activate();
@@ -407,12 +407,12 @@ public class PlayCollectTest {
         pc.observe(observer);
         pc.execute();
 
-        pc.detectorListener.process(new DtmfEventImpl(detector, "1", -30));
-        pc.detectorListener.process(new DtmfEventImpl(detector, "2", -30));
-        pc.detectorListener.process(new DtmfEventImpl(detector, "3", -30));
-        pc.detectorListener.process(new DtmfEventImpl(detector, "4", -30));
-        pc.detectorListener.process(new DtmfEventImpl(detector, "5", -30));
-        pc.detectorListener.process(new DtmfEventImpl(detector, "#", -30));
+        pc.process(new DtmfEventImpl(detector, "1", -30));
+        pc.process(new DtmfEventImpl(detector, "2", -30));
+        pc.process(new DtmfEventImpl(detector, "3", -30));
+        pc.process(new DtmfEventImpl(detector, "4", -30));
+        pc.process(new DtmfEventImpl(detector, "5", -30));
+        pc.process(new DtmfEventImpl(detector, "#", -30));
 
         // then
         verify(detector, times(1)).activate();
@@ -443,14 +443,14 @@ public class PlayCollectTest {
         pc.observe(observer);
         pc.execute();
 
-        pc.detectorListener.process(new DtmfEventImpl(detector, "1", -30));
-        pc.detectorListener.process(new DtmfEventImpl(detector, "2", -30));
-        pc.detectorListener.process(new DtmfEventImpl(detector, "3", -30));
-        pc.detectorListener.process(new DtmfEventImpl(detector, "4", -30));
-        pc.detectorListener.process(new DtmfEventImpl(detector, "5", -30));
-        pc.detectorListener.process(new DtmfEventImpl(detector, "A", -30));
-        pc.detectorListener.process(new DtmfEventImpl(detector, "B", -30));
-        pc.detectorListener.process(new DtmfEventImpl(detector, "#", -30));
+        pc.process(new DtmfEventImpl(detector, "1", -30));
+        pc.process(new DtmfEventImpl(detector, "2", -30));
+        pc.process(new DtmfEventImpl(detector, "3", -30));
+        pc.process(new DtmfEventImpl(detector, "4", -30));
+        pc.process(new DtmfEventImpl(detector, "5", -30));
+        pc.process(new DtmfEventImpl(detector, "A", -30));
+        pc.process(new DtmfEventImpl(detector, "B", -30));
+        pc.process(new DtmfEventImpl(detector, "#", -30));
 
         // then
         verify(detector, times(1)).activate();
@@ -481,9 +481,9 @@ public class PlayCollectTest {
         pc.observe(observer);
         pc.execute();
 
-        pc.detectorListener.process(new DtmfEventImpl(detector, "9", -30));
-        pc.detectorListener.process(new DtmfEventImpl(detector, "1", -30));
-        pc.detectorListener.process(new DtmfEventImpl(detector, "#", -30));
+        pc.process(new DtmfEventImpl(detector, "9", -30));
+        pc.process(new DtmfEventImpl(detector, "1", -30));
+        pc.process(new DtmfEventImpl(detector, "#", -30));
 
         // then
         verify(detector, times(1)).activate();
@@ -513,10 +513,10 @@ public class PlayCollectTest {
         pc.observe(observer);
         pc.execute();
 
-        pc.detectorListener.process(new DtmfEventImpl(detector, "9", -30));
-        pc.detectorListener.process(new DtmfEventImpl(detector, "A", -30));
-        pc.detectorListener.process(new DtmfEventImpl(detector, "C", -30));
-        pc.detectorListener.process(new DtmfEventImpl(detector, "#", -30));
+        pc.process(new DtmfEventImpl(detector, "9", -30));
+        pc.process(new DtmfEventImpl(detector, "A", -30));
+        pc.process(new DtmfEventImpl(detector, "C", -30));
+        pc.process(new DtmfEventImpl(detector, "#", -30));
 
         // then
         verify(detector, times(1)).activate();
@@ -577,7 +577,7 @@ public class PlayCollectTest {
         pc.observe(observer);
         pc.execute();
 
-        pc.playerListener.process(new AudioPlayerEvent(player, AudioPlayerEvent.STOP));
+        pc.process(new AudioPlayerEvent(player, AudioPlayerEvent.STOP));
         Thread.sleep(6 * 100);
 
         // then
@@ -612,7 +612,7 @@ public class PlayCollectTest {
         pc.execute();
 
         Thread.sleep(40 * 100);
-        pc.detectorListener.process(new DtmfEventImpl(detector, "9", -30));
+        pc.process(new DtmfEventImpl(detector, "9", -30));
         Thread.sleep(31 * 100);
 
         // then
@@ -644,10 +644,10 @@ public class PlayCollectTest {
 
         // Simulate playback time to assure FirstDigitTimer is not interrupting
         Thread.sleep(5);
-        pc.playerListener.process(new AudioPlayerEvent(player, PlayerEvent.STOP));
+        pc.process(new AudioPlayerEvent(player, PlayerEvent.STOP));
         Thread.sleep(5);
-        pc.playerListener.process(new AudioPlayerEvent(player, PlayerEvent.STOP));
-        pc.detectorListener.process(new DtmfEventImpl(detector, "9", -30));
+        pc.process(new AudioPlayerEvent(player, PlayerEvent.STOP));
+        pc.process(new DtmfEventImpl(detector, "9", -30));
 
         // then
         verify(detector, times(1)).activate();
@@ -713,13 +713,13 @@ public class PlayCollectTest {
         pc.observe(observer);
         pc.execute();
 
-        pc.detectorListener.process(new DtmfEventImpl(detector, "1", -30));
-        pc.detectorListener.process(new DtmfEventImpl(detector, "A", -30));
-        pc.detectorListener.process(new DtmfEventImpl(detector, "#", -30));
+        pc.process(new DtmfEventImpl(detector, "1", -30));
+        pc.process(new DtmfEventImpl(detector, "A", -30));
+        pc.process(new DtmfEventImpl(detector, "#", -30));
         Thread.sleep(10);
-        pc.detectorListener.process(new DtmfEventImpl(detector, "1", -30));
-        pc.detectorListener.process(new DtmfEventImpl(detector, "A", -30));
-        pc.detectorListener.process(new DtmfEventImpl(detector, "#", -30));
+        pc.process(new DtmfEventImpl(detector, "1", -30));
+        pc.process(new DtmfEventImpl(detector, "A", -30));
+        pc.process(new DtmfEventImpl(detector, "#", -30));
 
         // then
         verify(detector, times(2)).activate();
@@ -751,16 +751,16 @@ public class PlayCollectTest {
         pc.execute();
 
         Thread.sleep(1000);
-        pc.playerListener.process(new AudioPlayerEvent(player, PlayerEvent.STOP));
+        pc.process(new AudioPlayerEvent(player, PlayerEvent.STOP));
 
         Thread.sleep(10);
-        pc.detectorListener.process(new DtmfEventImpl(detector, "A", -30));
+        pc.process(new DtmfEventImpl(detector, "A", -30));
 
         Thread.sleep(1000);
-        pc.playerListener.process(new AudioPlayerEvent(player, PlayerEvent.STOP));
+        pc.process(new AudioPlayerEvent(player, PlayerEvent.STOP));
 
         Thread.sleep(10);
-        pc.detectorListener.process(new DtmfEventImpl(detector, "1", -30));
+        pc.process(new DtmfEventImpl(detector, "1", -30));
 
         // then
         verify(detector, times(2)).activate();
@@ -795,16 +795,16 @@ public class PlayCollectTest {
         pc.execute();
 
         Thread.sleep(1000);
-        pc.playerListener.process(new AudioPlayerEvent(player, PlayerEvent.STOP));
+        pc.process(new AudioPlayerEvent(player, PlayerEvent.STOP));
 
         Thread.sleep(10);
-        pc.detectorListener.process(new DtmfEventImpl(detector, "A", -30));
+        pc.process(new DtmfEventImpl(detector, "A", -30));
 
         Thread.sleep(1000);
-        pc.playerListener.process(new AudioPlayerEvent(player, PlayerEvent.STOP));
+        pc.process(new AudioPlayerEvent(player, PlayerEvent.STOP));
 
         Thread.sleep(10);
-        pc.detectorListener.process(new DtmfEventImpl(detector, "A", -30));
+        pc.process(new DtmfEventImpl(detector, "A", -30));
 
         // then
         verify(detector, times(2)).activate();
@@ -839,33 +839,33 @@ public class PlayCollectTest {
         pc.observe(observer);
         pc.execute();
         // Play initial prompt
-        pc.playerListener.process(new AudioPlayerEvent(player, PlayerEvent.STOP));
+        pc.process(new AudioPlayerEvent(player, PlayerEvent.STOP));
 
         // Collect one digit and wait for timeout
         Thread.sleep(5);
-        pc.detectorListener.process(new DtmfEventImpl(detector, "1", -30));
+        pc.process(new DtmfEventImpl(detector, "1", -30));
         Thread.sleep(10 * 100);
 
         // Play reprompt
         Thread.sleep(5);
-        pc.playerListener.process(new AudioPlayerEvent(player, PlayerEvent.STOP));
+        pc.process(new AudioPlayerEvent(player, PlayerEvent.STOP));
         Thread.sleep(5);
-        pc.playerListener.process(new AudioPlayerEvent(player, PlayerEvent.STOP));
+        pc.process(new AudioPlayerEvent(player, PlayerEvent.STOP));
         // Collect one digit and wait for timeout
         Thread.sleep(5);
-        pc.detectorListener.process(new DtmfEventImpl(detector, "2", -30));
+        pc.process(new DtmfEventImpl(detector, "2", -30));
         Thread.sleep(10 * 100);
 
         // Play reprompt
-        pc.playerListener.process(new AudioPlayerEvent(player, PlayerEvent.STOP));
+        pc.process(new AudioPlayerEvent(player, PlayerEvent.STOP));
         Thread.sleep(5);
-        pc.playerListener.process(new AudioPlayerEvent(player, PlayerEvent.STOP));
+        pc.process(new AudioPlayerEvent(player, PlayerEvent.STOP));
 
         // Collect two digits
         Thread.sleep(5);
-        pc.detectorListener.process(new DtmfEventImpl(detector, "2", -30));
+        pc.process(new DtmfEventImpl(detector, "2", -30));
         Thread.sleep(5);
-        pc.detectorListener.process(new DtmfEventImpl(detector, "5", -30));
+        pc.process(new DtmfEventImpl(detector, "5", -30));
 
         // then
         verify(detector, times(3)).activate();
@@ -906,23 +906,23 @@ public class PlayCollectTest {
 
         // Play initial prompt
         Thread.sleep(20);
-        pc.playerListener.process(new AudioPlayerEvent(player, PlayerEvent.STOP));
+        pc.process(new AudioPlayerEvent(player, PlayerEvent.STOP));
 
         // Collect one digit and end input
         Thread.sleep(10);
-        pc.detectorListener.process(new DtmfEventImpl(detector, "1", -30));
-        pc.detectorListener.process(new DtmfEventImpl(detector, "2", -30));
-        pc.detectorListener.process(new DtmfEventImpl(detector, "B", -30));
+        pc.process(new DtmfEventImpl(detector, "1", -30));
+        pc.process(new DtmfEventImpl(detector, "2", -30));
+        pc.process(new DtmfEventImpl(detector, "B", -30));
         Thread.sleep(5 * 100);
 
         // Play reprompt
-        pc.playerListener.process(new AudioPlayerEvent(player, PlayerEvent.STOP));
+        pc.process(new AudioPlayerEvent(player, PlayerEvent.STOP));
 
         // Collect two digits and end input
         Thread.sleep(5);
-        pc.detectorListener.process(new DtmfEventImpl(detector, "1", -30));
-        pc.detectorListener.process(new DtmfEventImpl(detector, "2", -30));
-        pc.detectorListener.process(new DtmfEventImpl(detector, "A", -30));
+        pc.process(new DtmfEventImpl(detector, "1", -30));
+        pc.process(new DtmfEventImpl(detector, "2", -30));
+        pc.process(new DtmfEventImpl(detector, "A", -30));
         Thread.sleep(5 * 100);
 
         // then
@@ -962,22 +962,22 @@ public class PlayCollectTest {
 
         // Play initial prompt
         Thread.sleep(20);
-        pc.playerListener.process(new AudioPlayerEvent(player, PlayerEvent.STOP));
+        pc.process(new AudioPlayerEvent(player, PlayerEvent.STOP));
 
         // Collect one digit and end input
         Thread.sleep(10);
-        pc.detectorListener.process(new DtmfEventImpl(detector, "1", -30));
-        pc.detectorListener.process(new DtmfEventImpl(detector, "#", -30));
+        pc.process(new DtmfEventImpl(detector, "1", -30));
+        pc.process(new DtmfEventImpl(detector, "#", -30));
 
         // Play reprompt
         Thread.sleep(20);
-        pc.playerListener.process(new AudioPlayerEvent(player, PlayerEvent.STOP));
+        pc.process(new AudioPlayerEvent(player, PlayerEvent.STOP));
 
         // Collect two digits and end input
         Thread.sleep(10);
-        pc.detectorListener.process(new DtmfEventImpl(detector, "2", -30));
-        pc.detectorListener.process(new DtmfEventImpl(detector, "4", -30));
-        pc.detectorListener.process(new DtmfEventImpl(detector, "#", -30));
+        pc.process(new DtmfEventImpl(detector, "2", -30));
+        pc.process(new DtmfEventImpl(detector, "4", -30));
+        pc.process(new DtmfEventImpl(detector, "#", -30));
 
         // then
         verify(detector, times(2)).activate();
@@ -1015,25 +1015,25 @@ public class PlayCollectTest {
 
         // Play initial prompt
         Thread.sleep(20);
-        pc.playerListener.process(new AudioPlayerEvent(player, PlayerEvent.STOP));
+        pc.process(new AudioPlayerEvent(player, PlayerEvent.STOP));
 
         // Collect one digit and end input
         Thread.sleep(10);
-        pc.detectorListener.process(new DtmfEventImpl(detector, "1", -30));
-        pc.detectorListener.process(new DtmfEventImpl(detector, "2", -30));
-        pc.detectorListener.process(new DtmfEventImpl(detector, "B", -30));
-        pc.detectorListener.process(new DtmfEventImpl(detector, "#", -30));
+        pc.process(new DtmfEventImpl(detector, "1", -30));
+        pc.process(new DtmfEventImpl(detector, "2", -30));
+        pc.process(new DtmfEventImpl(detector, "B", -30));
+        pc.process(new DtmfEventImpl(detector, "#", -30));
 
         // Play reprompt
         Thread.sleep(20);
-        pc.playerListener.process(new AudioPlayerEvent(player, PlayerEvent.STOP));
+        pc.process(new AudioPlayerEvent(player, PlayerEvent.STOP));
 
         // Collect two digits and end input
         Thread.sleep(10);
-        pc.detectorListener.process(new DtmfEventImpl(detector, "1", -30));
-        pc.detectorListener.process(new DtmfEventImpl(detector, "2", -30));
-        pc.detectorListener.process(new DtmfEventImpl(detector, "A", -30));
-        pc.detectorListener.process(new DtmfEventImpl(detector, "#", -30));
+        pc.process(new DtmfEventImpl(detector, "1", -30));
+        pc.process(new DtmfEventImpl(detector, "2", -30));
+        pc.process(new DtmfEventImpl(detector, "A", -30));
+        pc.process(new DtmfEventImpl(detector, "#", -30));
 
         // then
         verify(detector, times(2)).activate();
@@ -1074,30 +1074,30 @@ public class PlayCollectTest {
 
         // Play initial prompt
         Thread.sleep(20);
-        pc.playerListener.process(new AudioPlayerEvent(player, PlayerEvent.STOP));
+        pc.process(new AudioPlayerEvent(player, PlayerEvent.STOP));
 
         // Collect no digits and wait for timeout
         Thread.sleep(6 * 100);
 
         // Play reprompt
         Thread.sleep(20);
-        pc.playerListener.process(new AudioPlayerEvent(player, PlayerEvent.STOP));
+        pc.process(new AudioPlayerEvent(player, PlayerEvent.STOP));
         Thread.sleep(20);
-        pc.playerListener.process(new AudioPlayerEvent(player, PlayerEvent.STOP));
+        pc.process(new AudioPlayerEvent(player, PlayerEvent.STOP));
 
         // Collect no digits and wait for timeout
         Thread.sleep(6 * 100);
 
         // Play reprompt
-        pc.playerListener.process(new AudioPlayerEvent(player, PlayerEvent.STOP));
+        pc.process(new AudioPlayerEvent(player, PlayerEvent.STOP));
         Thread.sleep(20);
-        pc.playerListener.process(new AudioPlayerEvent(player, PlayerEvent.STOP));
+        pc.process(new AudioPlayerEvent(player, PlayerEvent.STOP));
 
         // Collect two digits
         Thread.sleep(10);
-        pc.detectorListener.process(new DtmfEventImpl(detector, "2", -30));
+        pc.process(new DtmfEventImpl(detector, "2", -30));
         Thread.sleep(10);
-        pc.detectorListener.process(new DtmfEventImpl(detector, "5", -30));
+        pc.process(new DtmfEventImpl(detector, "5", -30));
 
         // then
         verify(detector, times(3)).activate();
@@ -1138,19 +1138,19 @@ public class PlayCollectTest {
 
         // Play initial prompt
         Thread.sleep(20);
-        pc.playerListener.process(new AudioPlayerEvent(player, PlayerEvent.STOP));
+        pc.process(new AudioPlayerEvent(player, PlayerEvent.STOP));
 
         // Collect no digits and timeout
         Thread.sleep(6 * 100);
 
         // Play reprompt
-        pc.playerListener.process(new AudioPlayerEvent(player, PlayerEvent.STOP));
+        pc.process(new AudioPlayerEvent(player, PlayerEvent.STOP));
 
         // Collect two digits and end input
         Thread.sleep(10);
-        pc.detectorListener.process(new DtmfEventImpl(detector, "1", -30));
-        pc.detectorListener.process(new DtmfEventImpl(detector, "2", -30));
-        pc.detectorListener.process(new DtmfEventImpl(detector, "A", -30));
+        pc.process(new DtmfEventImpl(detector, "1", -30));
+        pc.process(new DtmfEventImpl(detector, "2", -30));
+        pc.process(new DtmfEventImpl(detector, "A", -30));
         Thread.sleep(5 * 100);
 
         // then
@@ -1190,21 +1190,21 @@ public class PlayCollectTest {
 
         // Play initial prompt
         Thread.sleep(20);
-        pc.playerListener.process(new AudioPlayerEvent(player, PlayerEvent.STOP));
+        pc.process(new AudioPlayerEvent(player, PlayerEvent.STOP));
 
         // Collect no digits and end input
         Thread.sleep(10);
-        pc.detectorListener.process(new DtmfEventImpl(detector, "#", -30));
+        pc.process(new DtmfEventImpl(detector, "#", -30));
 
         // Play reprompt
         Thread.sleep(20);
-        pc.playerListener.process(new AudioPlayerEvent(player, PlayerEvent.STOP));
+        pc.process(new AudioPlayerEvent(player, PlayerEvent.STOP));
 
         // Collect two digits and end input
         Thread.sleep(10);
-        pc.detectorListener.process(new DtmfEventImpl(detector, "2", -30));
-        pc.detectorListener.process(new DtmfEventImpl(detector, "4", -30));
-        pc.detectorListener.process(new DtmfEventImpl(detector, "#", -30));
+        pc.process(new DtmfEventImpl(detector, "2", -30));
+        pc.process(new DtmfEventImpl(detector, "4", -30));
+        pc.process(new DtmfEventImpl(detector, "#", -30));
 
         // then
         verify(detector, times(2)).activate();
@@ -1242,22 +1242,22 @@ public class PlayCollectTest {
 
         // Play initial prompt
         Thread.sleep(20);
-        pc.playerListener.process(new AudioPlayerEvent(player, PlayerEvent.STOP));
+        pc.process(new AudioPlayerEvent(player, PlayerEvent.STOP));
 
         // Collect no digits and end input
         Thread.sleep(10);
-        pc.detectorListener.process(new DtmfEventImpl(detector, "#", -30));
+        pc.process(new DtmfEventImpl(detector, "#", -30));
 
         // Play reprompt
         Thread.sleep(20);
-        pc.playerListener.process(new AudioPlayerEvent(player, PlayerEvent.STOP));
+        pc.process(new AudioPlayerEvent(player, PlayerEvent.STOP));
 
         // Collect two digits and end input
         Thread.sleep(10);
-        pc.detectorListener.process(new DtmfEventImpl(detector, "1", -30));
-        pc.detectorListener.process(new DtmfEventImpl(detector, "2", -30));
-        pc.detectorListener.process(new DtmfEventImpl(detector, "A", -30));
-        pc.detectorListener.process(new DtmfEventImpl(detector, "#", -30));
+        pc.process(new DtmfEventImpl(detector, "1", -30));
+        pc.process(new DtmfEventImpl(detector, "2", -30));
+        pc.process(new DtmfEventImpl(detector, "A", -30));
+        pc.process(new DtmfEventImpl(detector, "#", -30));
 
         // then
         verify(detector, times(2)).activate();
@@ -1292,15 +1292,15 @@ public class PlayCollectTest {
         pc.observe(observer);
         pc.execute();
 
-        pc.detectorListener.process(new DtmfEventImpl(detector, "1", -30));
-        pc.detectorListener.process(new DtmfEventImpl(detector, "2", -30));
-        pc.detectorListener.process(new DtmfEventImpl(detector, "3", -30));
-        pc.detectorListener.process(new DtmfEventImpl(detector, "#", -30));
+        pc.process(new DtmfEventImpl(detector, "1", -30));
+        pc.process(new DtmfEventImpl(detector, "2", -30));
+        pc.process(new DtmfEventImpl(detector, "3", -30));
+        pc.process(new DtmfEventImpl(detector, "#", -30));
 
         Thread.sleep(10);
-        pc.playerListener.process(new AudioPlayerEvent(player, AudioPlayerEvent.STOP));
+        pc.process(new AudioPlayerEvent(player, AudioPlayerEvent.STOP));
         Thread.sleep(10);
-        pc.playerListener.process(new AudioPlayerEvent(player, AudioPlayerEvent.STOP));
+        pc.process(new AudioPlayerEvent(player, AudioPlayerEvent.STOP));
 
         // then
         verify(detector, times(1)).activate();
@@ -1336,15 +1336,15 @@ public class PlayCollectTest {
         pc.observe(observer);
         pc.execute();
 
-        pc.detectorListener.process(new DtmfEventImpl(detector, "1", -30));
-        pc.detectorListener.process(new DtmfEventImpl(detector, "2", -30));
-        pc.detectorListener.process(new DtmfEventImpl(detector, "A", -30));
-        pc.detectorListener.process(new DtmfEventImpl(detector, "#", -30));
+        pc.process(new DtmfEventImpl(detector, "1", -30));
+        pc.process(new DtmfEventImpl(detector, "2", -30));
+        pc.process(new DtmfEventImpl(detector, "A", -30));
+        pc.process(new DtmfEventImpl(detector, "#", -30));
 
         Thread.sleep(10);
-        pc.playerListener.process(new AudioPlayerEvent(player, AudioPlayerEvent.STOP));
+        pc.process(new AudioPlayerEvent(player, AudioPlayerEvent.STOP));
         Thread.sleep(10);
-        pc.playerListener.process(new AudioPlayerEvent(player, AudioPlayerEvent.STOP));
+        pc.process(new AudioPlayerEvent(player, AudioPlayerEvent.STOP));
 
         // then
         verify(detector, times(1)).activate();
@@ -1381,14 +1381,14 @@ public class PlayCollectTest {
         pc.observe(observer);
         pc.execute();
 
-        pc.detectorListener.process(new DtmfEventImpl(detector, "1", -30));
-        pc.detectorListener.process(new DtmfEventImpl(detector, "2", -30));
+        pc.process(new DtmfEventImpl(detector, "1", -30));
+        pc.process(new DtmfEventImpl(detector, "2", -30));
         Thread.sleep(6 * 100);
 
         Thread.sleep(10);
-        pc.playerListener.process(new AudioPlayerEvent(player, AudioPlayerEvent.STOP));
+        pc.process(new AudioPlayerEvent(player, AudioPlayerEvent.STOP));
         Thread.sleep(10);
-        pc.playerListener.process(new AudioPlayerEvent(player, AudioPlayerEvent.STOP));
+        pc.process(new AudioPlayerEvent(player, AudioPlayerEvent.STOP));
 
         // then
         verify(detector, times(1)).activate();
@@ -1425,13 +1425,13 @@ public class PlayCollectTest {
         pc.observe(observer);
         pc.execute();
 
-        pc.detectorListener.process(new DtmfEventImpl(detector, "1", -30));
-        pc.detectorListener.process(new DtmfEventImpl(detector, "#", -30));
+        pc.process(new DtmfEventImpl(detector, "1", -30));
+        pc.process(new DtmfEventImpl(detector, "#", -30));
 
         Thread.sleep(10);
-        pc.playerListener.process(new AudioPlayerEvent(player, AudioPlayerEvent.STOP));
+        pc.process(new AudioPlayerEvent(player, AudioPlayerEvent.STOP));
         Thread.sleep(10);
-        pc.playerListener.process(new AudioPlayerEvent(player, AudioPlayerEvent.STOP));
+        pc.process(new AudioPlayerEvent(player, AudioPlayerEvent.STOP));
 
         // then
         verify(detector, times(1)).activate();
@@ -1467,15 +1467,15 @@ public class PlayCollectTest {
         pc.observe(observer);
         pc.execute();
 
-        pc.detectorListener.process(new DtmfEventImpl(detector, "1", -30));
-        pc.detectorListener.process(new DtmfEventImpl(detector, "2", -30));
-        pc.detectorListener.process(new DtmfEventImpl(detector, "B", -30));
-        pc.detectorListener.process(new DtmfEventImpl(detector, "#", -30));
+        pc.process(new DtmfEventImpl(detector, "1", -30));
+        pc.process(new DtmfEventImpl(detector, "2", -30));
+        pc.process(new DtmfEventImpl(detector, "B", -30));
+        pc.process(new DtmfEventImpl(detector, "#", -30));
 
         Thread.sleep(10);
-        pc.playerListener.process(new AudioPlayerEvent(player, AudioPlayerEvent.STOP));
+        pc.process(new AudioPlayerEvent(player, AudioPlayerEvent.STOP));
         Thread.sleep(10);
-        pc.playerListener.process(new AudioPlayerEvent(player, AudioPlayerEvent.STOP));
+        pc.process(new AudioPlayerEvent(player, AudioPlayerEvent.STOP));
 
         // then
         verify(detector, times(1)).activate();
@@ -1512,13 +1512,13 @@ public class PlayCollectTest {
         pc.observe(observer);
         pc.execute();
 
-        pc.detectorListener.process(new DtmfEventImpl(detector, "1", -30));
+        pc.process(new DtmfEventImpl(detector, "1", -30));
         Thread.sleep(6 * 100);
 
         Thread.sleep(10);
-        pc.playerListener.process(new AudioPlayerEvent(player, AudioPlayerEvent.STOP));
+        pc.process(new AudioPlayerEvent(player, AudioPlayerEvent.STOP));
         Thread.sleep(10);
-        pc.playerListener.process(new AudioPlayerEvent(player, AudioPlayerEvent.STOP));
+        pc.process(new AudioPlayerEvent(player, AudioPlayerEvent.STOP));
 
         // then
         verify(detector, times(1)).activate();
@@ -1552,7 +1552,7 @@ public class PlayCollectTest {
         pc.execute();
 
         Thread.sleep(10);
-        pc.playerListener.process(new AudioPlayerEvent(player, AudioPlayerEvent.STOP));
+        pc.process(new AudioPlayerEvent(player, AudioPlayerEvent.STOP));
         pc.cancel();
 
         // then
@@ -1590,8 +1590,8 @@ public class PlayCollectTest {
         pc.execute();
 
         Thread.sleep(10);
-        pc.detectorListener.process(new DtmfEventImpl(detector, "1", -30));
-        pc.detectorListener.process(new DtmfEventImpl(detector, "2", -30));
+        pc.process(new DtmfEventImpl(detector, "1", -30));
+        pc.process(new DtmfEventImpl(detector, "2", -30));
         pc.cancel();
 
         // then
@@ -1655,11 +1655,11 @@ public class PlayCollectTest {
         pc.execute();
 
         Thread.sleep(10);
-        pc.detectorListener.process(new DtmfEventImpl(detector, "1", -30));
-        pc.detectorListener.process(new DtmfEventImpl(detector, "A", -30));
-        pc.detectorListener.process(new DtmfEventImpl(detector, "B", -30));
-        pc.detectorListener.process(new DtmfEventImpl(detector, "C", -30));
-        pc.detectorListener.process(new DtmfEventImpl(detector, "2", -30));
+        pc.process(new DtmfEventImpl(detector, "1", -30));
+        pc.process(new DtmfEventImpl(detector, "A", -30));
+        pc.process(new DtmfEventImpl(detector, "B", -30));
+        pc.process(new DtmfEventImpl(detector, "C", -30));
+        pc.process(new DtmfEventImpl(detector, "2", -30));
         pc.cancel();
 
         // then
@@ -1693,11 +1693,11 @@ public class PlayCollectTest {
         pc.execute();
 
         Thread.sleep(10);
-        pc.detectorListener.process(new DtmfEventImpl(detector, "1", -30));
-        pc.detectorListener.process(new DtmfEventImpl(detector, "A", -30));
-        pc.detectorListener.process(new DtmfEventImpl(detector, "B", -30));
-        pc.detectorListener.process(new DtmfEventImpl(detector, "C", -30));
-        pc.detectorListener.process(new DtmfEventImpl(detector, "D", -30));
+        pc.process(new DtmfEventImpl(detector, "1", -30));
+        pc.process(new DtmfEventImpl(detector, "A", -30));
+        pc.process(new DtmfEventImpl(detector, "B", -30));
+        pc.process(new DtmfEventImpl(detector, "C", -30));
+        pc.process(new DtmfEventImpl(detector, "D", -30));
         pc.cancel();
 
         // then
@@ -1728,10 +1728,10 @@ public class PlayCollectTest {
         pc.execute();
 
         Thread.sleep(10);
-        pc.detectorListener.process(new DtmfEventImpl(detector, "1", -30));
-        pc.detectorListener.process(new DtmfEventImpl(detector, "#", -30));
+        pc.process(new DtmfEventImpl(detector, "1", -30));
+        pc.process(new DtmfEventImpl(detector, "#", -30));
         Thread.sleep(10);
-        pc.playerListener.process(new AudioPlayerEvent(player, AudioPlayerEvent.STOP));
+        pc.process(new AudioPlayerEvent(player, AudioPlayerEvent.STOP));
         pc.cancel();
 
         // then
@@ -1767,10 +1767,10 @@ public class PlayCollectTest {
         pc.execute();
 
         Thread.sleep(10);
-        pc.detectorListener.process(new DtmfEventImpl(detector, "1", -30));
-        pc.detectorListener.process(new DtmfEventImpl(detector, "#", -30));
+        pc.process(new DtmfEventImpl(detector, "1", -30));
+        pc.process(new DtmfEventImpl(detector, "#", -30));
         Thread.sleep(10);
-        pc.playerListener.process(new AudioPlayerEvent(player, AudioPlayerEvent.STOP));
+        pc.process(new AudioPlayerEvent(player, AudioPlayerEvent.STOP));
         pc.cancel();
 
         // then
@@ -1807,15 +1807,15 @@ public class PlayCollectTest {
 
         // Play initial prompt
         Thread.sleep(5);
-        pc.playerListener.process(new AudioPlayerEvent(player, PlayerEvent.STOP));
+        pc.process(new AudioPlayerEvent(player, PlayerEvent.STOP));
         Thread.sleep(5);
 
         // collect one digit and wait for timeout
-        pc.detectorListener.process(new DtmfEventImpl(detector, "1", -30));
+        pc.process(new DtmfEventImpl(detector, "1", -30));
         Thread.sleep(11 * 100);
 
         // Play reprompt
-        pc.playerListener.process(new AudioPlayerEvent(player, PlayerEvent.STOP));
+        pc.process(new AudioPlayerEvent(player, PlayerEvent.STOP));
         pc.cancel();
 
         // then
@@ -1856,13 +1856,13 @@ public class PlayCollectTest {
         pc.execute();
 
         // Play initial prompt
-        pc.playerListener.process(new AudioPlayerEvent(player, PlayerEvent.STOP));
+        pc.process(new AudioPlayerEvent(player, PlayerEvent.STOP));
 
         // wait for timeout without collecting any digit
         Thread.sleep(21 * 100);
 
         // Play reprompt
-        pc.playerListener.process(new AudioPlayerEvent(player, PlayerEvent.STOP));
+        pc.process(new AudioPlayerEvent(player, PlayerEvent.STOP));
         pc.cancel();
 
         // then

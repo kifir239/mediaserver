@@ -71,8 +71,9 @@ public class GenericCollectFsmImpl extends
 
     private final CollectStateHandlerExt extension;
 
-    public GenericCollectFsmImpl(DtmfDetector detector, Player player, AsrEngine asrEngine, CollectStateHandlerExt extension, MgcpEventSubject mgcpEventSubject, ListeningScheduledExecutorService executor,
-                                 GenericCollectContext context) {
+    public GenericCollectFsmImpl(DtmfDetector detector, Player player, AsrEngine asrEngine,
+                                 CollectStateHandlerExt extension, MgcpEventSubject mgcpEventSubject,
+                                 ListeningScheduledExecutorService executor, GenericCollectContext context) {
         super();
         // Scheduler
         this.executor = executor;
@@ -121,6 +122,14 @@ public class GenericCollectFsmImpl extends
             fire(GenericCollectEvent.FAIL, context);
             // TODO create transition from PROMPTING to FAILED
         }
+    }
+
+    public DtmfDetectorListener getDetectorListener() {
+        return detectorListener;
+    }
+
+    public PlayerListener getPlayerListener() {
+        return playerListener;
     }
 
     @Override
