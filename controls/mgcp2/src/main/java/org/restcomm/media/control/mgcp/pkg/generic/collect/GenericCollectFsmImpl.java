@@ -19,35 +19,34 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-package org.restcomm.media.control.mgcp.pkg.au.pc;
+package org.restcomm.media.control.mgcp.pkg.generic.collect;
+
+import com.google.common.util.concurrent.ListeningScheduledExecutorService;
+import org.apache.log4j.Logger;
+import org.restcomm.media.control.mgcp.pkg.MgcpEventSubject;
+import org.restcomm.media.control.mgcp.pkg.au.Playlist;
+import org.restcomm.media.control.mgcp.pkg.au.ReturnCode;
+import org.restcomm.media.resource.asr.AsrEngine;
+import org.restcomm.media.spi.ResourceUnavailableException;
+import org.restcomm.media.spi.dtmf.DtmfDetector;
+import org.restcomm.media.spi.dtmf.DtmfDetectorListener;
+import org.restcomm.media.spi.dtmf.DtmfEvent;
+import org.restcomm.media.spi.listener.TooManyListenersException;
+import org.restcomm.media.spi.player.Player;
+import org.restcomm.media.spi.player.PlayerEvent;
+import org.restcomm.media.spi.player.PlayerListener;
+import org.squirrelframework.foundation.fsm.impl.AbstractStateMachine;
 
 import java.net.MalformedURLException;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.log4j.Logger;
-import org.restcomm.media.control.mgcp.pkg.MgcpEventSubject;
-import org.restcomm.media.control.mgcp.pkg.au.OperationComplete;
-import org.restcomm.media.control.mgcp.pkg.au.OperationFailed;
-import org.restcomm.media.control.mgcp.pkg.au.Playlist;
-import org.restcomm.media.control.mgcp.pkg.au.ReturnCode;
-import org.restcomm.media.spi.ResourceUnavailableException;
-import org.restcomm.media.spi.dtmf.DtmfDetector;
-import org.restcomm.media.spi.dtmf.DtmfDetectorListener;
-import org.restcomm.media.spi.listener.TooManyListenersException;
-import org.restcomm.media.spi.player.Player;
-import org.restcomm.media.spi.player.PlayerListener;
-import org.squirrelframework.foundation.fsm.impl.AbstractStateMachine;
-
-import com.google.common.util.concurrent.ListeningScheduledExecutorService;
-
 /**
  * @author Henrique Rosa (henrique.rosa@telestax.com)
- *
  */
-public class PlayCollectFsmImpl extends
-        AbstractStateMachine<PlayCollectFsm, PlayCollectState, PlayCollectEvent, PlayCollectContext> implements PlayCollectFsm {
+public class GenericCollectFsmImpl extends
+        AbstractStateMachine<GenericCollectFsm, GenericCollectState, GenericCollectEvent, GenericCollectContext> implements GenericCollectFsm {
 
-    private static final Logger log = Logger.getLogger(PlayCollectFsmImpl.class);
+    private static final Logger log = Logger.getLogger(GenericCollectFsmImpl.class);
 
     // Scheduler
     private final ListeningScheduledExecutorService executor;
@@ -57,33 +56,53 @@ public class PlayCollectFsmImpl extends
 
     // Media Components
     private final DtmfDetector detector;
-    final DtmfDetectorListener detectorListener;
+    private final DtmfDetectorListener detectorListener;
 
     private final Player player;
-    final PlayerListener playerListener;
+    private final PlayerListener playerListener;
 
     // Execution Context
-    private final PlayCollectContext context;
+    private final GenericCollectContext context;
 
-    public PlayCollectFsmImpl(DtmfDetector detector, DtmfDetectorListener detectorListener, Player player,
-            PlayerListener playerListener, MgcpEventSubject mgcpEventSubject, ListeningScheduledExecutorService executor,
-            PlayCollectContext context) {
+    //Nullable - use supportAsr to check
+    private final AsrEngine asrEngine;
+    //Nullable - use supportAsr to check
+    private final AsrEngine.AsrEngineListener asrEngineListener;
+
+    private final CollectStateHandlerExt extension;
+
+    public GenericCollectFsmImpl(DtmfDetector detector, Player player, AsrEngine asrEngine, CollectStateHandlerExt extension, MgcpEventSubject mgcpEventSubject, ListeningScheduledExecutorService executor,
+                                 GenericCollectContext context) {
         super();
         // Scheduler
         this.executor = executor;
+
+        System.out.println("!!! new asrEngine = " + asrEngine);
+        this.asrEngine = asrEngine;
 
         // Event Listener
         this.mgcpEventSubject = mgcpEventSubject;
 
         // Media Components
         this.detector = detector;
-        this.detectorListener = detectorListener;
+        this.detectorListener = new DetectorListener();
 
         this.player = player;
-        this.playerListener = playerListener;
+        this.playerListener = new AudioPlayerListener();
 
         // Execution Context
         this.context = context;
+
+        if (extension == null) {
+            throw new IllegalStateException("Signal must provide extension implementation");
+        }
+        this.extension = extension;
+
+        this.asrEngineListener = supportAsr() ? new LocalAsrEngineListener() : null;
+    }
+
+    public boolean supportAsr() {
+        return this.asrEngine != null;
     }
 
     private void playAnnouncement(String url, long delay) {
@@ -94,19 +113,19 @@ public class PlayCollectFsmImpl extends
         } catch (MalformedURLException e) {
             log.warn("Could not play malformed segment " + url);
             context.setReturnCode(ReturnCode.BAD_AUDIO_ID.code());
-            fire(PlayCollectEvent.FAIL, context);
+            fire(GenericCollectEvent.FAIL, context);
             // TODO create transition from PROMPTING to FAILED
         } catch (ResourceUnavailableException e) {
             log.warn("Could not play unavailable segment " + url);
             context.setReturnCode(ReturnCode.BAD_AUDIO_ID.code());
-            fire(PlayCollectEvent.FAIL, context);
+            fire(GenericCollectEvent.FAIL, context);
             // TODO create transition from PROMPTING to FAILED
         }
     }
 
     @Override
-    public void enterPlayCollect(PlayCollectState from, PlayCollectState to, PlayCollectEvent event,
-            PlayCollectContext context) {
+    public void enterPlayCollect(GenericCollectState from, GenericCollectState to, GenericCollectEvent event,
+                                 GenericCollectContext context) {
         if (log.isTraceEnabled()) {
             log.trace("Entered PLAY_COLLECT state");
         }
@@ -114,8 +133,8 @@ public class PlayCollectFsmImpl extends
     }
 
     @Override
-    public void exitPlayCollect(PlayCollectState from, PlayCollectState to, PlayCollectEvent event,
-            PlayCollectContext context) {
+    public void exitPlayCollect(GenericCollectState from, GenericCollectState to, GenericCollectEvent event,
+                                GenericCollectContext context) {
         if (log.isTraceEnabled()) {
             log.trace("Exited PLAY_COLLECT state");
         }
@@ -123,8 +142,8 @@ public class PlayCollectFsmImpl extends
     }
 
     @Override
-    public void enterLoadingPlaylist(PlayCollectState from, PlayCollectState to, PlayCollectEvent event,
-            PlayCollectContext context) {
+    public void enterLoadingPlaylist(GenericCollectState from, GenericCollectState to, GenericCollectEvent event,
+                                     GenericCollectContext context) {
         if (log.isTraceEnabled()) {
             log.trace("Entered LOADING PLAYLIST state");
         }
@@ -132,48 +151,48 @@ public class PlayCollectFsmImpl extends
         if (event == null) {
             final Playlist prompt = context.getInitialPrompt();
             if (prompt.isEmpty()) {
-                fire(PlayCollectEvent.NO_PROMPT, context);
+                fire(GenericCollectEvent.NO_PROMPT, context);
             } else {
-                fire(PlayCollectEvent.PROMPT, context);
+                fire(GenericCollectEvent.PROMPT, context);
             }
         } else {
             switch (event) {
                 case RESTART:
                     final Playlist reprompt = context.getReprompt();
                     if (reprompt.isEmpty()) {
-                        fire(PlayCollectEvent.NO_PROMPT, context);
+                        fire(GenericCollectEvent.NO_PROMPT, context);
                     } else {
-                        fire(PlayCollectEvent.REPROMPT, context);
+                        fire(GenericCollectEvent.REPROMPT, context);
                     }
                     break;
 
                 case NO_DIGITS:
                     final Playlist noDigitsReprompt = context.getNoDigitsReprompt();
                     if (noDigitsReprompt.isEmpty()) {
-                        fire(PlayCollectEvent.NO_PROMPT, context);
+                        fire(GenericCollectEvent.NO_PROMPT, context);
                     } else {
-                        fire(PlayCollectEvent.NO_DIGITS, context);
+                        fire(GenericCollectEvent.NO_DIGITS, context);
                     }
                     break;
 
                 case REINPUT:
                 default:
-                    fire(PlayCollectEvent.NO_PROMPT, context);
+                    fire(GenericCollectEvent.NO_PROMPT, context);
                     break;
             }
         }
     }
 
     @Override
-    public void exitLoadingPlaylist(PlayCollectState from, PlayCollectState to, PlayCollectEvent event,
-            PlayCollectContext context) {
+    public void exitLoadingPlaylist(GenericCollectState from, GenericCollectState to, GenericCollectEvent event,
+                                    GenericCollectContext context) {
         if (log.isTraceEnabled()) {
             log.trace("Exited LOADING PLAYLIST state");
         }
     }
 
     @Override
-    public void enterPrompting(PlayCollectState from, PlayCollectState to, PlayCollectEvent event, PlayCollectContext context) {
+    public void enterPrompting(GenericCollectState from, GenericCollectState to, GenericCollectEvent event, GenericCollectContext context) {
         if (log.isTraceEnabled()) {
             log.trace("Entered PROMPTING state");
         }
@@ -186,12 +205,12 @@ public class PlayCollectFsmImpl extends
         } catch (TooManyListenersException e) {
             log.error("Too many player listeners", e);
             context.setReturnCode(ReturnCode.UNSPECIFIED_FAILURE.code());
-            fire(PlayCollectEvent.FAIL, context);
+            fire(GenericCollectEvent.FAIL, context);
         }
     }
 
     @Override
-    public void onPrompting(PlayCollectState from, PlayCollectState to, PlayCollectEvent event, PlayCollectContext context) {
+    public void onPrompting(GenericCollectState from, GenericCollectState to, GenericCollectEvent event, GenericCollectContext context) {
         if (log.isTraceEnabled()) {
             log.trace("On PROMPTING state");
         }
@@ -201,14 +220,14 @@ public class PlayCollectFsmImpl extends
 
         if (track.isEmpty()) {
             // No more announcements to play
-            fire(PlayCollectEvent.END_PROMPT, context);
+            fire(GenericCollectEvent.END_PROMPT, context);
         } else {
             playAnnouncement(track, 10 * 100);
         }
     }
 
     @Override
-    public void exitPrompting(PlayCollectState from, PlayCollectState to, PlayCollectEvent event, PlayCollectContext context) {
+    public void exitPrompting(GenericCollectState from, GenericCollectState to, GenericCollectEvent event, GenericCollectContext context) {
         if (log.isTraceEnabled()) {
             log.trace("Exited PROMPTING state");
         }
@@ -218,8 +237,8 @@ public class PlayCollectFsmImpl extends
     }
 
     @Override
-    public void enterReprompting(PlayCollectState from, PlayCollectState to, PlayCollectEvent event,
-            PlayCollectContext context) {
+    public void enterReprompting(GenericCollectState from, GenericCollectState to, GenericCollectEvent event,
+                                 GenericCollectContext context) {
         if (log.isTraceEnabled()) {
             log.trace("Entered REPROMPTING state");
         }
@@ -232,12 +251,12 @@ public class PlayCollectFsmImpl extends
         } catch (TooManyListenersException e) {
             log.error("Too many player listeners", e);
             context.setReturnCode(ReturnCode.UNSPECIFIED_FAILURE.code());
-            fire(PlayCollectEvent.FAIL, context);
+            fire(GenericCollectEvent.FAIL, context);
         }
     }
 
     @Override
-    public void onReprompting(PlayCollectState from, PlayCollectState to, PlayCollectEvent event, PlayCollectContext context) {
+    public void onReprompting(GenericCollectState from, GenericCollectState to, GenericCollectEvent event, GenericCollectContext context) {
         if (log.isTraceEnabled()) {
             log.trace("On REPROMPTING state");
         }
@@ -247,15 +266,15 @@ public class PlayCollectFsmImpl extends
 
         if (track.isEmpty()) {
             // No more announcements to play
-            fire(PlayCollectEvent.END_PROMPT, context);
+            fire(GenericCollectEvent.END_PROMPT, context);
         } else {
             playAnnouncement(track, 10 * 100);
         }
     }
 
     @Override
-    public void exitReprompting(PlayCollectState from, PlayCollectState to, PlayCollectEvent event,
-            PlayCollectContext context) {
+    public void exitReprompting(GenericCollectState from, GenericCollectState to, GenericCollectEvent event,
+                                GenericCollectContext context) {
         if (log.isTraceEnabled()) {
             log.trace("Exited REPROMPTING state");
         }
@@ -265,8 +284,8 @@ public class PlayCollectFsmImpl extends
     }
 
     @Override
-    public void enterNoDigitsReprompting(PlayCollectState from, PlayCollectState to, PlayCollectEvent event,
-            PlayCollectContext context) {
+    public void enterNoDigitsReprompting(GenericCollectState from, GenericCollectState to, GenericCollectEvent event,
+                                         GenericCollectContext context) {
         if (log.isTraceEnabled()) {
             log.trace("Entered NO DIGITS REPROMPTING state");
         }
@@ -279,13 +298,13 @@ public class PlayCollectFsmImpl extends
         } catch (TooManyListenersException e) {
             log.error("Too many player listeners", e);
             context.setReturnCode(ReturnCode.UNSPECIFIED_FAILURE.code());
-            fire(PlayCollectEvent.FAIL, context);
+            fire(GenericCollectEvent.FAIL, context);
         }
     }
 
     @Override
-    public void onNoDigitsReprompting(PlayCollectState from, PlayCollectState to, PlayCollectEvent event,
-            PlayCollectContext context) {
+    public void onNoDigitsReprompting(GenericCollectState from, GenericCollectState to, GenericCollectEvent event,
+                                      GenericCollectContext context) {
         if (log.isTraceEnabled()) {
             log.trace("On NO DIGITS REPROMPTING state");
         }
@@ -295,15 +314,15 @@ public class PlayCollectFsmImpl extends
 
         if (track.isEmpty()) {
             // No more announcements to play
-            fire(PlayCollectEvent.END_PROMPT, context);
+            fire(GenericCollectEvent.END_PROMPT, context);
         } else {
             playAnnouncement(track, 10 * 100);
         }
     }
 
     @Override
-    public void exitNoDigitsReprompting(PlayCollectState from, PlayCollectState to, PlayCollectEvent event,
-            PlayCollectContext context) {
+    public void exitNoDigitsReprompting(GenericCollectState from, GenericCollectState to, GenericCollectEvent event,
+                                        GenericCollectContext context) {
         if (log.isTraceEnabled()) {
             log.trace("Exited NO DIGITS REPROMPTING state");
         }
@@ -311,13 +330,13 @@ public class PlayCollectFsmImpl extends
         this.player.removeListener(this.playerListener);
         this.player.deactivate();
     }
-    
+
     @Override
-    public void enterPrompted(PlayCollectState from, PlayCollectState to, PlayCollectEvent event, PlayCollectContext context) {
+    public void enterPrompted(GenericCollectState from, GenericCollectState to, GenericCollectEvent event, GenericCollectContext context) {
         // Check if no digit has been pressed while prompt was playing
         if (context.countCollectedDigits() == 0) {
             // Activate timer for first digit
-            if(log.isTraceEnabled()) {
+            if (log.isTraceEnabled()) {
                 log.trace("Scheduled First Digit Timer to fire in " + context.getFirstDigitTimer() + " ms");
             }
             this.executor.schedule(new DetectorTimer(context), context.getFirstDigitTimer(), TimeUnit.MILLISECONDS);
@@ -325,8 +344,8 @@ public class PlayCollectFsmImpl extends
     }
 
     @Override
-    public void enterCollecting(PlayCollectState from, PlayCollectState to, PlayCollectEvent event,
-            PlayCollectContext context) {
+    public void enterCollecting(GenericCollectState from, GenericCollectState to, GenericCollectEvent event,
+                                GenericCollectContext context) {
         if (log.isTraceEnabled()) {
             log.trace("Entered COLLECTING state");
         }
@@ -338,10 +357,17 @@ public class PlayCollectFsmImpl extends
         } catch (TooManyListenersException e) {
             log.error("Too many DTMF listeners", e);
         }
+
+        System.out.println("!!! this.asrEngine = " + this.asrEngine);
+        if (supportAsr()) {
+            this.asrEngine.configure("stub", "en");
+            this.asrEngine.setListener(asrEngineListener);
+            this.asrEngine.activate();
+        }
     }
 
     @Override
-    public void onCollecting(PlayCollectState from, PlayCollectState to, PlayCollectEvent event, PlayCollectContext context) {
+    public void onCollecting(GenericCollectState from, GenericCollectState to, GenericCollectEvent event, GenericCollectContext context) {
         if (log.isTraceEnabled()) {
             log.trace(
                     "On COLLECTING state [digits=" + context.getCollectedDigits() + ", attempt=" + context.getAttempt() + "]");
@@ -350,7 +376,7 @@ public class PlayCollectFsmImpl extends
         // Stop current prompt IF is interruptible
         if (!context.getNonInterruptibleAudio()) {
             // TODO check if child state PLAYING is currently active
-            fire(PlayCollectEvent.END_PROMPT, context);
+            fire(GenericCollectEvent.END_PROMPT, context);
         }
 
         final char tone = context.getLastTone();
@@ -358,13 +384,13 @@ public class PlayCollectFsmImpl extends
         if (context.getReinputKey() == tone) {
             // Force collection to cancel any scheduled timeout
             context.collectDigit(tone);
-            fire(PlayCollectEvent.REINPUT, context);
+            fire(GenericCollectEvent.REINPUT, context);
         } else if (context.getRestartKey() == tone) {
             // Force collection to cancel any scheduled timeout
             context.collectDigit(tone);
-            fire(PlayCollectEvent.RESTART, context);
+            fire(GenericCollectEvent.RESTART, context);
         } else if (context.getEndInputKey() == tone) {
-            fire(PlayCollectEvent.END_INPUT, context);
+            fire(GenericCollectEvent.END_INPUT, context);
         } else {
             // Make sure first digit matches StartInputKey
             if (context.countCollectedDigits() == 0 && context.getStartInputKeys().indexOf(tone) == -1) {
@@ -379,10 +405,10 @@ public class PlayCollectFsmImpl extends
             // Stop collecting if maximum number of digits was reached.
             // Only verified if no Digit Pattern was defined.
             if (!context.hasDigitPattern() && context.countCollectedDigits() == context.getMaximumDigits()) {
-                fire(PlayCollectEvent.END_INPUT, context);
+                fire(GenericCollectEvent.END_INPUT, context);
             } else {
                 // Start interdigit timer
-                if(log.isTraceEnabled()) {
+                if (log.isTraceEnabled()) {
                     log.trace("Scheduled Inter Digit Timer to fire in " + context.getFirstDigitTimer() + " ms");
                 }
                 this.executor.schedule(new DetectorTimer(context), context.getInterDigitTimer(), TimeUnit.MILLISECONDS);
@@ -391,18 +417,23 @@ public class PlayCollectFsmImpl extends
     }
 
     @Override
-    public void exitCollecting(PlayCollectState from, PlayCollectState to, PlayCollectEvent event, PlayCollectContext context) {
+    public void exitCollecting(GenericCollectState from, GenericCollectState to, GenericCollectEvent event, GenericCollectContext context) {
         if (log.isTraceEnabled()) {
             log.trace("Exited COLLECTING state");
         }
 
         this.detector.removeListener(this.detectorListener);
         this.detector.deactivate();
+
+        if (supportAsr()) {
+            this.asrEngine.setListener(null);
+            this.asrEngine.deactivate();
+        }
     }
 
     @Override
-    public void enterEvaluating(PlayCollectState from, PlayCollectState to, PlayCollectEvent event,
-            PlayCollectContext context) {
+    public void enterEvaluating(GenericCollectState from, GenericCollectState to, GenericCollectEvent event,
+                                GenericCollectContext context) {
         if (log.isTraceEnabled()) {
             log.trace("Entered EVALUATING state.");
         }
@@ -410,91 +441,91 @@ public class PlayCollectFsmImpl extends
         final int digitCount = context.countCollectedDigits();
         if (digitCount == 0) {
             // No digits were collected
-            fire(PlayCollectEvent.NO_DIGITS, context);
+            fire(GenericCollectEvent.NO_DIGITS, context);
         } else if (context.hasDigitPattern()) {
             // Succeed if digit pattern matches. Otherwise retry
             if (context.getCollectedDigits().matches(context.getDigitPattern())) {
-                fire(PlayCollectEvent.SUCCEED, context);
+                fire(GenericCollectEvent.SUCCEED, context);
             } else {
-                fire(PlayCollectEvent.PATTERN_MISMATCH, context);
+                fire(GenericCollectEvent.PATTERN_MISMATCH, context);
             }
         } else if (digitCount < context.getMinimumDigits()) {
             // Minimum digits not met
-            fire(PlayCollectEvent.PATTERN_MISMATCH, context);
+            fire(GenericCollectEvent.PATTERN_MISMATCH, context);
         } else {
             // Pattern validation was successful
-            fire(PlayCollectEvent.SUCCEED, context);
+            fire(GenericCollectEvent.SUCCEED, context);
         }
     }
 
     @Override
-    public void exitEvaluating(PlayCollectState from, PlayCollectState to, PlayCollectEvent event, PlayCollectContext context) {
+    public void exitEvaluating(GenericCollectState from, GenericCollectState to, GenericCollectEvent event, GenericCollectContext context) {
         if (log.isTraceEnabled()) {
             log.trace("Exited EVALUATING state");
         }
     }
 
     @Override
-    public void enterCanceled(PlayCollectState from, PlayCollectState to, PlayCollectEvent event, PlayCollectContext context) {
+    public void enterCanceled(GenericCollectState from, GenericCollectState to, GenericCollectEvent event, GenericCollectContext context) {
         if (log.isTraceEnabled()) {
             log.trace("Entered CANCELED state");
         }
-        
+
         final int digitCount = context.countCollectedDigits();
         if (digitCount == 0) {
             // No digits were collected
             context.setReturnCode(ReturnCode.NO_DIGITS.code());
-            fire(PlayCollectEvent.FAIL, context);
+            fire(GenericCollectEvent.FAIL, context);
         } else if (context.hasDigitPattern()) {
             // Succeed if digit pattern matches. Otherwise retry
             if (context.getCollectedDigits().matches(context.getDigitPattern())) {
-                fire(PlayCollectEvent.SUCCEED, context);
+                fire(GenericCollectEvent.SUCCEED, context);
             } else {
                 context.setReturnCode(ReturnCode.DIGIT_PATTERN_NOT_MATCHED.code());
-                fire(PlayCollectEvent.FAIL, context);
+                fire(GenericCollectEvent.FAIL, context);
             }
         } else if (digitCount < context.getMinimumDigits()) {
             // Minimum digits not met
             context.setReturnCode(ReturnCode.DIGIT_PATTERN_NOT_MATCHED.code());
-            fire(PlayCollectEvent.FAIL, context);
+            fire(GenericCollectEvent.FAIL, context);
         } else {
             // Pattern validation was successful
-            fire(PlayCollectEvent.SUCCEED, context);
+            fire(GenericCollectEvent.SUCCEED, context);
         }
     }
 
     @Override
-    public void exitCanceled(PlayCollectState from, PlayCollectState to, PlayCollectEvent event, PlayCollectContext context) {
+    public void exitCanceled(GenericCollectState from, GenericCollectState to, GenericCollectEvent event, GenericCollectContext context) {
         if (log.isTraceEnabled()) {
             log.trace("Exited CANCELED state");
         }
     }
 
     @Override
-    public void enterSucceeding(PlayCollectState from, PlayCollectState to, PlayCollectEvent event,
-            PlayCollectContext context) {
+    public void enterSucceeding(GenericCollectState from, GenericCollectState to, GenericCollectEvent event,
+                                GenericCollectContext context) {
         if (log.isTraceEnabled()) {
             log.trace("Entered SUCCEEDING state");
         }
 
         final Playlist prompt = context.getSuccessAnnouncement();
         if (prompt.isEmpty()) {
-            fire(PlayCollectEvent.NO_PROMPT, context);
+            fire(GenericCollectEvent.NO_PROMPT, context);
         } else {
-            fire(PlayCollectEvent.PROMPT, context);
+            fire(GenericCollectEvent.PROMPT, context);
         }
     }
 
     @Override
-    public void exitSucceeding(PlayCollectState from, PlayCollectState to, PlayCollectEvent event, PlayCollectContext context) {
+    public void exitSucceeding(GenericCollectState from, GenericCollectState to, GenericCollectEvent event, GenericCollectContext context) {
         if (log.isTraceEnabled()) {
             log.trace("Entered SUCCEEDING state");
         }
     }
 
     @Override
-    public void enterPlayingSuccess(PlayCollectState from, PlayCollectState to, PlayCollectEvent event,
-            PlayCollectContext context) {
+    public void enterPlayingSuccess(GenericCollectState from, GenericCollectState to, GenericCollectEvent event,
+                                    GenericCollectContext context) {
         if (log.isTraceEnabled()) {
             log.trace("Entered PLAYING SUCCESS state");
         }
@@ -507,13 +538,13 @@ public class PlayCollectFsmImpl extends
         } catch (TooManyListenersException e) {
             log.error("Too many player listeners", e);
             context.setReturnCode(ReturnCode.UNSPECIFIED_FAILURE.code());
-            fire(PlayCollectEvent.FAIL, context);
+            fire(GenericCollectEvent.FAIL, context);
         }
     }
 
     @Override
-    public void onPlayingSuccess(PlayCollectState from, PlayCollectState to, PlayCollectEvent event,
-            PlayCollectContext context) {
+    public void onPlayingSuccess(GenericCollectState from, GenericCollectState to, GenericCollectEvent event,
+                                 GenericCollectContext context) {
         if (log.isTraceEnabled()) {
             log.trace("On PLAYING SUCCESS state");
         }
@@ -523,15 +554,15 @@ public class PlayCollectFsmImpl extends
 
         if (track.isEmpty()) {
             // No more announcements to play
-            fire(PlayCollectEvent.END_PROMPT, context);
+            fire(GenericCollectEvent.END_PROMPT, context);
         } else {
             playAnnouncement(track, 10 * 100);
         }
     }
 
     @Override
-    public void exitPlayingSuccess(PlayCollectState from, PlayCollectState to, PlayCollectEvent event,
-            PlayCollectContext context) {
+    public void exitPlayingSuccess(GenericCollectState from, GenericCollectState to, GenericCollectEvent event,
+                                   GenericCollectContext context) {
         if (log.isTraceEnabled()) {
             log.trace("Exited PLAYING SUCCESS state");
         }
@@ -541,25 +572,15 @@ public class PlayCollectFsmImpl extends
     }
 
     @Override
-    public void enterSucceeded(PlayCollectState from, PlayCollectState to, PlayCollectEvent event, PlayCollectContext context) {
+    public void enterSucceeded(GenericCollectState from, GenericCollectState to, GenericCollectEvent event, GenericCollectContext context) {
         if (log.isTraceEnabled()) {
             log.trace("Entered SUCCEEDED state");
         }
-
-        final int attempt = context.getAttempt();
-        String collectedDigits = context.getCollectedDigits();
-        if (context.getIncludeEndInputKey()) {
-            collectedDigits += context.getEndInputKey();
-        }
-
-        final OperationComplete operationComplete = new OperationComplete(PlayCollect.SYMBOL, ReturnCode.SUCCESS.code());
-        operationComplete.setParameter("na", String.valueOf(attempt));
-        operationComplete.setParameter("dc", collectedDigits);
-        this.mgcpEventSubject.notify(this.mgcpEventSubject, operationComplete);
+        extension.enterSucceeded(from, to, event, context);
     }
 
     @Override
-    public void enterFailing(PlayCollectState from, PlayCollectState to, PlayCollectEvent event, PlayCollectContext context) {
+    public void enterFailing(GenericCollectState from, GenericCollectState to, GenericCollectEvent event, GenericCollectContext context) {
         if (log.isTraceEnabled()) {
             log.trace("Entered FAILING state");
         }
@@ -575,7 +596,7 @@ public class PlayCollectFsmImpl extends
 
                 case PATTERN_MISMATCH:
                 default:
-                    fire(PlayCollectEvent.RESTART, context);
+                    fire(GenericCollectEvent.RESTART, context);
                     break;
             }
         } else {
@@ -600,23 +621,23 @@ public class PlayCollectFsmImpl extends
 
             final Playlist prompt = context.getFailureAnnouncement();
             if (prompt.isEmpty()) {
-                fire(PlayCollectEvent.NO_PROMPT, context);
+                fire(GenericCollectEvent.NO_PROMPT, context);
             } else {
-                fire(PlayCollectEvent.PROMPT, context);
+                fire(GenericCollectEvent.PROMPT, context);
             }
         }
     }
 
     @Override
-    public void exitFailing(PlayCollectState from, PlayCollectState to, PlayCollectEvent event, PlayCollectContext context) {
+    public void exitFailing(GenericCollectState from, GenericCollectState to, GenericCollectEvent event, GenericCollectContext context) {
         if (log.isTraceEnabled()) {
             log.trace("Exited FAILING state");
         }
     }
 
     @Override
-    public void enterPlayingFailure(PlayCollectState from, PlayCollectState to, PlayCollectEvent event,
-            PlayCollectContext context) {
+    public void enterPlayingFailure(GenericCollectState from, GenericCollectState to, GenericCollectEvent event,
+                                    GenericCollectContext context) {
         if (log.isTraceEnabled()) {
             log.trace("Entered PLAYING FAILURE state");
         }
@@ -629,13 +650,13 @@ public class PlayCollectFsmImpl extends
         } catch (TooManyListenersException e) {
             log.error("Too many player listeners", e);
             context.setReturnCode(ReturnCode.UNSPECIFIED_FAILURE.code());
-            fire(PlayCollectEvent.FAIL, context);
+            fire(GenericCollectEvent.FAIL, context);
         }
     }
 
     @Override
-    public void onPlayingFailure(PlayCollectState from, PlayCollectState to, PlayCollectEvent event,
-            PlayCollectContext context) {
+    public void onPlayingFailure(GenericCollectState from, GenericCollectState to, GenericCollectEvent event,
+                                 GenericCollectContext context) {
         if (log.isTraceEnabled()) {
             log.trace("On PLAYING FAILURE state");
         }
@@ -645,15 +666,15 @@ public class PlayCollectFsmImpl extends
 
         if (track.isEmpty()) {
             // No more announcements to play
-            fire(PlayCollectEvent.END_PROMPT, context);
+            fire(GenericCollectEvent.END_PROMPT, context);
         } else {
             playAnnouncement(track, 10 * 100);
         }
     }
 
     @Override
-    public void exitPlayingFailure(PlayCollectState from, PlayCollectState to, PlayCollectEvent event,
-            PlayCollectContext context) {
+    public void exitPlayingFailure(GenericCollectState from, GenericCollectState to, GenericCollectEvent event,
+                                   GenericCollectContext context) {
         if (log.isTraceEnabled()) {
             log.trace("Exited PLAYING FAILURE state");
         }
@@ -663,27 +684,32 @@ public class PlayCollectFsmImpl extends
     }
 
     @Override
-    public void enterFailed(PlayCollectState from, PlayCollectState to, PlayCollectEvent event, PlayCollectContext context) {
+    public void enterFailed(GenericCollectState from, GenericCollectState to, GenericCollectEvent event, GenericCollectContext context) {
         if (log.isTraceEnabled()) {
             log.trace("Entered FAILED state");
         }
+        extension.enterFailed(from, to, event, context);
+    }
 
-        final OperationFailed operationFailed = new OperationFailed(PlayCollect.SYMBOL, context.getReturnCode());
-        this.mgcpEventSubject.notify(this.mgcpEventSubject, operationFailed);
+    private final class LocalAsrEngineListener implements AsrEngine.AsrEngineListener {
+
+        @Override
+        public void onSpeechRecognized(String text) {
+            fire(GenericCollectEvent.RECOGNIZED_TEXT, context);
+        }
     }
 
     /**
      * Timer that defines interval the system will wait for user's input. May interrupt Collect process.
-     * 
-     * @author Henrique Rosa (henrique.rosa@telestax.com)
      *
+     * @author Henrique Rosa (henrique.rosa@telestax.com)
      */
     private final class DetectorTimer implements Runnable {
 
         private final long timestamp;
-        private final PlayCollectContext context;
+        private final GenericCollectContext context;
 
-        public DetectorTimer(PlayCollectContext context) {
+        public DetectorTimer(GenericCollectContext context) {
             this.timestamp = System.currentTimeMillis();
             this.context = context;
         }
@@ -691,11 +717,11 @@ public class PlayCollectFsmImpl extends
         @Override
         public void run() {
             if (context.getLastCollectedDigitOn() <= this.timestamp) {
-                if (PlayCollectState.PLAY_COLLECT.equals(getCurrentState())) {
+                if (GenericCollectState.PLAY_COLLECT.equals(getCurrentState())) {
                     if (log.isDebugEnabled()) {
                         log.debug("Timing out collect operation! " + context.getLastCollectedDigitOn() + " <= " + this.timestamp);
                     }
-                    fire(PlayCollectEvent.TIMEOUT, context);
+                    fire(GenericCollectEvent.TIMEOUT, context);
                 }
             } else {
                 if (log.isTraceEnabled()) {
@@ -705,6 +731,52 @@ public class PlayCollectFsmImpl extends
 
         }
 
+    }
+
+    /**
+     * Listens to DTMF events raised by the DTMF Detector.
+     *
+     * @author Henrique Rosa (henrique.rosa@telestax.com)
+     */
+    private final class DetectorListener implements DtmfDetectorListener {
+
+        @Override
+        public void process(DtmfEvent event) {
+            final char tone = event.getTone().charAt(0);
+            context.setLastTone(tone);
+            GenericCollectFsmImpl.this.fire(GenericCollectEvent.DTMF_TONE, GenericCollectFsmImpl.this.context);
+        }
+
+    }
+
+    /**
+     * Listen to Play events raised by the Player.
+     *
+     * @author Henrique Rosa (henrique.rosa@telestax.com)
+     */
+    private final class AudioPlayerListener implements PlayerListener {
+
+        @Override
+        public void process(PlayerEvent event) {
+            switch (event.getID()) {
+                case PlayerEvent.STOP:
+                    GenericCollectFsmImpl.this.fire(GenericCollectEvent.NEXT_TRACK, GenericCollectFsmImpl.this.context);
+                    break;
+
+                case PlayerEvent.FAILED:
+                    // TODO handle player failure
+                    break;
+
+                default:
+                    break;
+            }
+        }
+    }
+
+    public interface CollectStateHandlerExt {
+        void enterSucceeded(GenericCollectState from, GenericCollectState to, GenericCollectEvent event, GenericCollectContext context);
+
+        void enterFailed(GenericCollectState from, GenericCollectState to, GenericCollectEvent event, GenericCollectContext context);
     }
 
 }

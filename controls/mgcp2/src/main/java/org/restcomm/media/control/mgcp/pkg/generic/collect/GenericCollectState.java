@@ -18,17 +18,20 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-        
-package org.restcomm.media.control.mgcp.pkg.au.pc;
+
+package org.restcomm.media.control.mgcp.pkg.generic.collect;
 
 /**
  * @author Henrique Rosa (henrique.rosa@telestax.com)
  *
  */
-public enum PlayCollectEvent {
+public enum GenericCollectState {
 
-    PROMPT, REPROMPT, NO_DIGITS, NO_PROMPT, NEXT_TRACK, END_PROMPT, END_INPUT, DTMF_TONE, 
-    EVALUATE, TIMEOUT, CANCEL, RESTART, REINPUT, PATTERN_MISMATCH, MAX_ATTEMPTS, 
-    PLAY_SUCCESS, PLAY_FAILURE, SUCCEED, FAIL;
+    PLAY_COLLECT, 
+    PLAY, LOADING_PLAYLIST, PROMPTING, REPROMPTING, NO_DIGITS_REPROMPTING, PROMPTED,
+    COLLECT, COLLECTING, COLLECTED,
+    CANCELED, EVALUATING,
+    SUCCEEDING, PLAYING_SUCCESS, SUCCEEDED,
+    FAILING, PLAYING_FAILURE, FAILED;
 
 }

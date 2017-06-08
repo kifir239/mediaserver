@@ -26,6 +26,9 @@ import javax.sound.sampled.spi.AudioFileReader;
 import org.restcomm.media.ComponentType;
 import org.restcomm.media.component.audio.AudioComponent;
 import org.restcomm.media.component.oob.OOBComponent;
+import org.restcomm.media.resource.asr.AsrEngine;
+import org.restcomm.media.resource.asr.AsrEngineImpl;
+import org.restcomm.media.resource.asr.AsrEngineProvider;
 import org.restcomm.media.resource.dtmf.DetectorImpl;
 import org.restcomm.media.resource.player.audio.AudioPlayerImpl;
 import org.restcomm.media.resource.recorder.audio.AudioRecorderImpl;
@@ -51,10 +54,11 @@ public class MediaGroupImpl implements MediaGroup {
     private final Recorder recorder;
     private final DtmfDetector detector;
     private final DtmfGenerator generator;
+    private final AsrEngine asrEngine;
 
     // TODO Add list of enum that declare which media components are created in the media group
     public MediaGroupImpl(AudioComponent audioComponent, OOBComponent oobComponent, PlayerProvider players,
-            RecorderProvider recorders, DtmfDetectorProvider detectors) {
+            RecorderProvider recorders, DtmfDetectorProvider detectors, AsrEngineProvider asrEngines) {
         // Media Components
         this.audioComponent = audioComponent;
         this.oobComponent = oobComponent;
@@ -62,6 +66,7 @@ public class MediaGroupImpl implements MediaGroup {
         this.player = initializePlayer(players);
         this.recorder = initializeRecorder(recorders);
         this.detector = initializeDetector(detectors);
+        this.asrEngine = initializeAsr(asrEngines);
         this.generator = null;
     }
 
@@ -105,6 +110,18 @@ public class MediaGroupImpl implements MediaGroup {
         return recorder;
     }
 
+    private AsrEngine initializeAsr(AsrEngineProvider provider) {
+        // TODO try getting rid of AudioRecorderImpl cast
+        System.out.println("!! initializeAsr");
+        AsrEngineImpl engine = (AsrEngineImpl) provider.provide();
+        audioComponent.addOutput(engine.getAudioOutput());
+        //oobComponent.addOutput(engine.getAudioOutput());
+        /*audioComponent.updateMode(false, true);
+        oobComponent.updateMode(false, true);*/
+        // updateEndpoint(0,1);
+        return engine;
+    }
+
     @Override
     public Player getPlayer() {
         return this.player;
@@ -131,5 +148,9 @@ public class MediaGroupImpl implements MediaGroup {
 
     public OOBComponent getOobComponent() {
         return oobComponent;
+    }
+
+    public AsrEngine getAsrEngine() {
+        return asrEngine;
     }
 }

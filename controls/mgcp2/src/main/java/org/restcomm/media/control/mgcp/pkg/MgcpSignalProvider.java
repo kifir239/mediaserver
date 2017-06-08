@@ -26,6 +26,7 @@ import java.util.Map;
 import org.restcomm.media.control.mgcp.command.param.NotifiedEntity;
 import org.restcomm.media.control.mgcp.endpoint.MediaGroup;
 import org.restcomm.media.control.mgcp.endpoint.MgcpEndpoint;
+import org.restcomm.media.control.mgcp.pkg.asr.AsrwgsSignal;
 import org.restcomm.media.control.mgcp.pkg.au.AudioPackage;
 import org.restcomm.media.control.mgcp.pkg.au.AudioSignalType;
 import org.restcomm.media.control.mgcp.pkg.au.EndSignal;
@@ -94,6 +95,8 @@ public class MgcpSignalProvider {
             case PLAY_COLLECT:
                 return new PlayCollect(mediaGroup.getPlayer(), mediaGroup.getDetector(), requestId, notifiedEntity, parameters, executor);
 
+            case ASR_WGS:
+                return new AsrwgsSignal(mediaGroup.getPlayer(), mediaGroup.getDetector(), mediaGroup.getAsrEngine(), requestId, notifiedEntity, parameters, executor);
             case PLAY_RECORD:
                 return new PlayRecord(mediaGroup.getPlayer(), mediaGroup.getDetector(), mediaGroup.getRecorder(), requestId, notifiedEntity, parameters);
 

@@ -19,7 +19,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-package org.restcomm.media.control.mgcp.pkg.au.pc;
+package org.restcomm.media.control.mgcp.pkg.generic.collect;
 
 import java.util.Map;
 
@@ -34,10 +34,7 @@ import com.google.common.base.Optional;
  * @author Henrique Rosa (henrique.rosa@telestax.com)
  *
  */
-public class PlayCollectContext {
-
-    // Signal options
-    private final Map<String, String> parameters;
+public class GenericCollectContext {
 
     // Playlists
     private final Playlist initialPrompt;
@@ -53,9 +50,11 @@ public class PlayCollectContext {
     private int attempt;
     private int returnCode;
 
-    public PlayCollectContext(DtmfDetector detector, DtmfDetectorListener detectorListener, Map<String, String> parameters) {
+    private final Parameters params;
+
+    public GenericCollectContext(Parameters params) {
         // Signal Options
-        this.parameters = parameters;
+        this.params = params;
 
         // Playlists
         this.initialPrompt = new Playlist(getInitialPromptSegments(), 1);
@@ -72,12 +71,6 @@ public class PlayCollectContext {
         this.attempt = 1;
     }
 
-    /*
-     * Signal Options
-     */
-    private String getParameter(String name) {
-        return this.parameters.get(name);
-    }
 
     /**
      * The initial announcement prompting the user to either enter DTMF digits or to speak.
@@ -89,8 +82,7 @@ public class PlayCollectContext {
      * @return The array of audio prompts. Array will be empty if none is specified.
      */
     private String[] getInitialPromptSegments() {
-        String value = Optional.fromNullable(getParameter(SignalParameters.INITIAL_PROMPT.symbol())).or("");
-        return value.isEmpty() ? new String[0] : value.split(",");
+        return this.params.initialPromptParam;
     }
 
     public Playlist getInitialPrompt() {
@@ -106,8 +98,7 @@ public class PlayCollectContext {
      * @return The array of audio prompts. Array will be empty if none is specified.
      */
     private String[] getRepromptSegments() {
-        String segments = Optional.fromNullable(getParameter(SignalParameters.REPROMPT.symbol())).or("");
-        return segments.isEmpty() ? getInitialPromptSegments() : segments.split(",");
+        return this.params.repromptSegments;
     }
 
     public Playlist getReprompt() {
@@ -123,8 +114,7 @@ public class PlayCollectContext {
      * @return The array of audio prompts. Array will be empty if none is specified.
      */
     private String[] getNoDigitsRepromptSegments() {
-        String segments = Optional.fromNullable(getParameter(SignalParameters.NO_DIGITS_REPROMPT.symbol())).or("");
-        return segments.isEmpty() ? getRepromptSegments() : segments.split(",");
+        return this.params.noDigitsRepromptSegments;
     }
 
     public Playlist getNoDigitsReprompt() {
@@ -140,8 +130,7 @@ public class PlayCollectContext {
      * @return The array of audio prompts. Array will be empty if none is specified.
      */
     private String[] getFailureAnnouncementSegments() {
-        String value = Optional.fromNullable(getParameter(SignalParameters.FAILURE_ANNOUNCEMENT.symbol())).or("");
-        return value.isEmpty() ? new String[0] : value.split(",");
+        return this.params.failureAnnSegments;
     }
 
     public Playlist getFailureAnnouncement() {
@@ -161,8 +150,7 @@ public class PlayCollectContext {
      * @return The array of audio prompts. Array will be empty if none is specified.
      */
     private String[] getSuccessAnnouncementSegments() {
-        String value = Optional.fromNullable(getParameter(SignalParameters.SUCCESS_ANNOUNCEMENT.symbol())).or("");
-        return value.isEmpty() ? new String[0] : value.split(",");
+        return this.params.seccessAnnSegments;
     }
 
     public Playlist getSuccessAnnouncement() {
@@ -182,8 +170,7 @@ public class PlayCollectContext {
      * @return
      */
     public boolean getNonInterruptibleAudio() {
-        String value = Optional.fromNullable(getParameter(SignalParameters.NON_INTERRUPTIBLE_PLAY.symbol())).or("false");
-        return Boolean.parseBoolean(value);
+        return this.params.nonInterruptibleAudio;
     }
 
     /**
@@ -195,8 +182,7 @@ public class PlayCollectContext {
      * @return
      */
     public boolean getClearDigitBuffer() {
-        String value = Optional.fromNullable(getParameter(SignalParameters.CLEAR_DIGIT_BUFFER.symbol())).or("false");
-        return Boolean.parseBoolean(value);
+        return this.params.clearDigitBuffer;
     }
 
     /**
@@ -208,8 +194,7 @@ public class PlayCollectContext {
      * @return
      */
     public int getMinimumDigits() {
-        String value = Optional.fromNullable(getParameter(SignalParameters.MINIMUM_NUM_DIGITS.symbol())).or("1");
-        return Integer.parseInt(value);
+        return this.params.minimumDigits;
     }
 
     /**
@@ -221,8 +206,7 @@ public class PlayCollectContext {
      * @return
      */
     public int getMaximumDigits() {
-        String value = Optional.fromNullable(getParameter(SignalParameters.MAXIMUM_NUM_DIGITS.symbol())).or("1");
-        return Integer.parseInt(value);
+        return this.params.maximumDigits;
     }
 
     /**
@@ -237,16 +221,11 @@ public class PlayCollectContext {
      * @return The digit pattern or an empty String if not specified.
      */
     public String getDigitPattern() {
-        String pattern = Optional.fromNullable(getParameter(SignalParameters.DIGIT_PATTERN.symbol())).or("");
-        if (!pattern.isEmpty()) {
-            // Replace pattern to comply with MEGACO digitMap
-            pattern = pattern.replace(".", "*").replace("x", "\\d");
-        }
-        return pattern;
+        return this.params.digitsPattern;
     }
 
     public boolean hasDigitPattern() {
-        return !Optional.fromNullable(getParameter(SignalParameters.DIGIT_PATTERN.symbol())).or("").isEmpty();
+        return this.params.hasDigitsPattern;
     }
 
     /**
@@ -258,8 +237,7 @@ public class PlayCollectContext {
      * @return
      */
     public int getFirstDigitTimer() {
-        String value = Optional.fromNullable(getParameter(SignalParameters.FIRST_DIGIT_TIMER.symbol())).or("50");
-        return Integer.parseInt(value) * 100;
+        return this.params.firstDigitTimer;
     }
 
     /**
@@ -271,8 +249,7 @@ public class PlayCollectContext {
      * @return
      */
     public int getInterDigitTimer() {
-        String value = Optional.fromNullable(getParameter(SignalParameters.INTER_DIGIT_TIMER.symbol())).or("30");
-        return Integer.parseInt(value) * 100;
+        return this.params.interDigitTimer;
     }
 
     /**
@@ -289,8 +266,7 @@ public class PlayCollectContext {
      * @return
      */
     public int getExtraDigitTimer() {
-        String value = Optional.fromNullable(getParameter(SignalParameters.EXTRA_DIGIT_TIMER.symbol())).or("");
-        return Integer.parseInt(value) * 100;
+        return this.params.extraDigitTimer;
     }
 
     /**
@@ -308,8 +284,7 @@ public class PlayCollectContext {
      * @return
      */
     public char getRestartKey() {
-        String value = Optional.fromNullable(getParameter(SignalParameters.RESTART_KEY.symbol())).or("");
-        return value.isEmpty() ? ' ' : value.charAt(0);
+        return this.params.restartKey;
     }
 
     /**
@@ -329,8 +304,7 @@ public class PlayCollectContext {
      * @return
      */
     public char getReinputKey() {
-        String value = Optional.fromNullable(getParameter(SignalParameters.REINPUT_KEY.symbol())).or("");
-        return value.isEmpty() ? ' ' : value.charAt(0);
+        return this.params.reinputKey;
     }
 
     /**
@@ -348,8 +322,7 @@ public class PlayCollectContext {
      * @return
      */
     public char getReturnKey() {
-        String value = Optional.fromNullable(getParameter(SignalParameters.RETURN_KEY.symbol())).or("");
-        return value.isEmpty() ? ' ' : value.charAt(0);
+        return this.params.returnKey;
     }
 
     /**
@@ -362,8 +335,7 @@ public class PlayCollectContext {
      * @return
      */
     public char getPositionKey() {
-        String value = Optional.fromNullable(getParameter(SignalParameters.POSITION_KEY.symbol())).or("");
-        return value.isEmpty() ? ' ' : value.charAt(0);
+        return this.params.getPositionKey;
     }
 
     /**
@@ -375,8 +347,7 @@ public class PlayCollectContext {
      * @return
      */
     public char getStopKey() {
-        String value = Optional.fromNullable(getParameter(SignalParameters.STOP_KEY.symbol())).or("");
-        return value.isEmpty() ? ' ' : value.charAt(0);
+        return this.params.stopKey;
     }
 
     /**
@@ -394,7 +365,7 @@ public class PlayCollectContext {
      * @return
      */
     public String getStartInputKeys() {
-        return Optional.fromNullable(getParameter(SignalParameters.START_INPUT_KEY.symbol())).or("0123456789");
+        return this.params.startInputKeys;
     }
 
     /**
@@ -410,8 +381,7 @@ public class PlayCollectContext {
      * @return
      */
     public char getEndInputKey() {
-        String value = Optional.fromNullable(getParameter(SignalParameters.END_INPUT_KEY.symbol())).or("");
-        return value.isEmpty() ? '#' : value.charAt(0);
+        return this.params.endInputKey;
     }
 
     /**
@@ -424,8 +394,7 @@ public class PlayCollectContext {
      * @return
      */
     public boolean getIncludeEndInputKey() {
-        String value = Optional.fromNullable(getParameter(SignalParameters.INCLUDE_END_INPUT_KEY.symbol())).or("false");
-        return Boolean.parseBoolean(value);
+        return this.params.hasEndInputKey;
     }
 
     /**
@@ -437,8 +406,7 @@ public class PlayCollectContext {
      * @return
      */
     public int getNumberOfAttempts() {
-        String value = Optional.fromNullable(getParameter(SignalParameters.NUMBER_OF_ATTEMPTS.symbol())).or("1");
-        return Integer.parseInt(value);
+        return this.params.numOfAttemts;
     }
 
     /*
@@ -503,4 +471,76 @@ public class PlayCollectContext {
         this.failureAnnouncement.rewind();
     }
 
+    public static class Parameters {
+        public final String[] initialPromptParam;
+        public final String[] repromptSegments;
+        public final String[] noDigitsRepromptSegments;
+        public final String[] failureAnnSegments;
+        public final String[] seccessAnnSegments;
+        public boolean nonInterruptibleAudio;
+        public boolean clearDigitBuffer;
+        public int minimumDigits;
+        public int maximumDigits;
+        public String digitsPattern;
+        public boolean hasDigitsPattern;
+        public int firstDigitTimer;
+        public int interDigitTimer;
+        public int extraDigitTimer;
+        public char restartKey;
+        public char reinputKey;
+        public char returnKey;
+        public char getPositionKey;
+        public char stopKey;
+        public String startInputKeys;
+        public char endInputKey;
+        public boolean hasEndInputKey;
+        public int numOfAttemts;
+
+        public Parameters(String[] initialPromptParam,
+                          String[] repromptSegments,
+                          String[] noDigitsRepromptSegments,
+                          String[] failureAnnSegments,
+                          String[] seccessAnnSegments,
+                          boolean nonInterruptibleAudio,
+                          boolean clearDigitBuffer,
+                          int minimumDigits,
+                          int maximumDigits,
+                          String digitsPattern,
+                          boolean hasDigitsPattern,
+                          int firstDigitTimer,
+                          int interDigitTimer,
+                          int extraDigitTimer,
+                          char restartKey,
+                          char reinputKey,
+                          char returnKey,
+                          char getPositionKey,
+                          char stopKey,
+                          String startInputKeys,
+                          char endInputKey,
+                          boolean hasEndInputKey,
+                          int numOfAttemts) { this.initialPromptParam = initialPromptParam;
+            this.repromptSegments = repromptSegments;
+            this.noDigitsRepromptSegments = noDigitsRepromptSegments;
+            this.failureAnnSegments = failureAnnSegments;
+            this.seccessAnnSegments = seccessAnnSegments;
+            this.nonInterruptibleAudio = nonInterruptibleAudio;
+            this.clearDigitBuffer = clearDigitBuffer;
+            this.minimumDigits = minimumDigits;
+            this.maximumDigits = maximumDigits;
+            this.digitsPattern = digitsPattern;
+            this.hasDigitsPattern = hasDigitsPattern;
+            this.firstDigitTimer = firstDigitTimer;
+            this.interDigitTimer = interDigitTimer;
+            this.extraDigitTimer = extraDigitTimer;
+            this.restartKey = restartKey;
+            this.reinputKey = reinputKey;
+            this.returnKey = returnKey;
+            this.getPositionKey = getPositionKey;
+            this.stopKey = stopKey;
+            this.startInputKeys = startInputKeys;
+            this.endInputKey = endInputKey;
+            this.hasEndInputKey = hasEndInputKey;
+            this.numOfAttemts = numOfAttemts;
+        }
+    }
 }

@@ -22,6 +22,8 @@
 package org.restcomm.media.bootstrap.ioc.provider.mgcp;
 
 import org.restcomm.media.control.mgcp.endpoint.provider.MediaGroupProvider;
+import org.restcomm.media.resource.asr.AsrEngine;
+import org.restcomm.media.resource.asr.AsrEngineProvider;
 import org.restcomm.media.spi.dtmf.DtmfDetectorProvider;
 import org.restcomm.media.spi.player.PlayerProvider;
 import org.restcomm.media.spi.recorder.RecorderProvider;
@@ -38,18 +40,20 @@ public class MediaGroupProviderProvider implements Provider<MediaGroupProvider> 
     private final PlayerProvider players;
     private final DtmfDetectorProvider detectors;
     private final RecorderProvider recorders;
+    private final AsrEngineProvider asrEngines;
 
     @Inject
-    public MediaGroupProviderProvider(PlayerProvider players, DtmfDetectorProvider detectors, RecorderProvider recorders) {
+    public MediaGroupProviderProvider(PlayerProvider players, DtmfDetectorProvider detectors, RecorderProvider recorders, AsrEngineProvider asrEngines) {
         super();
         this.players = players;
         this.detectors = detectors;
         this.recorders = recorders;
+        this.asrEngines = asrEngines;
     }
 
     @Override
     public MediaGroupProvider get() {
-        return new MediaGroupProvider(this.players, this.detectors, this.recorders);
+        return new MediaGroupProvider(this.players, this.detectors, this.recorders, this.asrEngines);
     }
 
 }
