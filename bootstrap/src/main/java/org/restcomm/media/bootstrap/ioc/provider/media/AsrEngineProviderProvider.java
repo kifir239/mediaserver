@@ -2,16 +2,18 @@ package org.restcomm.media.bootstrap.ioc.provider.media;
 
 import com.google.inject.Inject;
 import com.google.inject.Provider;
+import org.apache.log4j.Logger;
+import org.restcomm.media.core.configuration.DriverConfiguration;
 import org.restcomm.media.core.configuration.MediaServerConfiguration;
+import org.restcomm.media.core.configuration.SubsystemsConfiguration;
 import org.restcomm.media.resource.asr.*;
 import org.restcomm.media.scheduler.PriorityQueueScheduler;
-
-import java.nio.ByteBuffer;
 
 /**
  * Created by hamsterksu on 6/5/17.
  */
 public class AsrEngineProviderProvider implements Provider<AsrEngineProvider> {
+    private Logger logger = Logger.getLogger(AsrEngineProviderProvider.class);
 
     private final PriorityQueueScheduler scheduler;
     private final MediaServerConfiguration configuration;
@@ -35,7 +37,25 @@ public class AsrEngineProviderProvider implements Provider<AsrEngineProvider> {
     @Override
     public AsrEngineProvider get() {
         AsrDriverManager mng = new AsrDriverManager();
-        mng.registerDriver("stub", new StubAsrDriver());
+        final SubsystemsConfiguration subsystemsConfiguration = configuration.getSubsystemsConfiguration();
+        final DriverConfiguration driverConf = subsystemsConfiguration.getDriverConfiguration("asr");
+        if (driverConf != null) {
+            final String driverName = driverConf.getDriverName();
+            final String className = driverConf.getClassName();
+            try {
+                final Class<?> clazz = Class.forName(className);
+                final AsrDriver object = (AsrDriver)clazz.newInstance();
+                mng.registerDriver(driverConf.getDriverName(), object);
+                logger.info("Driver \'" + driverName + "' (" + className + ") is successfully registered");
+            } catch (final ClassNotFoundException | InstantiationException | IllegalAccessException e) {
+                logger.error("Failed to register instance of asr driver (className = " + className + "): "
+                        + e.getMessage());
+            }
+
+        } else {
+            logger.error("Asr driver is not configured - we will use StubAsrDriver");
+            mng.registerDriver("stub", new StubAsrDriver());
+        }
         return new AsrEngineProviderIml(scheduler, mng);
     }
 }
