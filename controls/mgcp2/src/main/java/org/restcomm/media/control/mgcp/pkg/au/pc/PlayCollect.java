@@ -55,7 +55,7 @@ import java.util.Map;
  */
 public class PlayCollect extends AbstractMgcpSignal {
 
-    private static final String SYMBOL = "pc";
+    public static final String SYMBOL = "pc";
 
     // Finite State Machine
     private final GenericCollectFsm fsm;

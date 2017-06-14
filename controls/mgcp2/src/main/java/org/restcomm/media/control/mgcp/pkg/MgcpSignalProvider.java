@@ -93,7 +93,7 @@ public class MgcpSignalProvider {
                 return new PlayAnnouncement(mediaGroup.getPlayer(), requestId, notifiedEntity, parameters);
 
             case PLAY_COLLECT:
-                return new PlayCollect(mediaGroup.getPlayer(), mediaGroup.getDetector(), requestId, notifiedEntity, parameters, executor);
+//                return new PlayCollect(mediaGroup.getPlayer(), mediaGroup.getDetector(), requestId, notifiedEntity, parameters, executor);
 
             case ASR_WGS:
                 return new AsrwgsSignal(mediaGroup.getPlayer(), mediaGroup.getDetector(), mediaGroup.getAsrEngine(), requestId, notifiedEntity, parameters, executor);

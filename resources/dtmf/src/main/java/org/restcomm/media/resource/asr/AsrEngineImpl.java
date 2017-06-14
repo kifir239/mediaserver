@@ -79,7 +79,7 @@ public class AsrEngineImpl extends AbstractSink implements AsrEngine, PooledObje
             return;
         }
         try {
-            output.start();
+            output.stop();
         } catch (Exception e) {
             //TODO use logger
             e.printStackTrace();
