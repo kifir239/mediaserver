@@ -3,7 +3,6 @@ package org.restcomm.media.core.configuration;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.naming.ConfigurationException;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -13,8 +12,11 @@ import java.util.Map;
 public class SubsystemsConfiguration {
     private final Map<String, DriverConfiguration> subsystems = new HashMap<>();
 
-    public Map<String, DriverConfiguration> getSubsystems() {
-        return Collections.unmodifiableMap(subsystems);
+    public DriverConfiguration getDriverConfiguration(final String subsystemName) {
+        if (subsystems.containsKey(subsystemName)) {
+            return subsystems.get(subsystemName);
+        } else {
+            return null;        }
     }
 
     public void addSubsystem(final String subsystemName, final DriverConfiguration driverConfig) throws ConfigurationException {

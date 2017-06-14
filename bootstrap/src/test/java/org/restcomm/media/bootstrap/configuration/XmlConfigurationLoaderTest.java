@@ -105,11 +105,7 @@ public class XmlConfigurationLoaderTest {
 
         final SubsystemsConfiguration subsystemsConf = config.getSubsystemsConfiguration();
         Assert.assertNotNull(subsystemsConf);
-        final Map<String, DriverConfiguration> subsystems = subsystemsConf.getSubsystems();
-        Assert.assertNotNull(subsystems);
-        Assert.assertEquals(1, subsystems.size());
-        Assert.assertTrue(subsystems.containsKey("asr"));
-        final DriverConfiguration driverConf = subsystems.get("asr");
+        final DriverConfiguration driverConf = subsystemsConf.getDriverConfiguration("asr");
         Assert.assertNotNull(driverConf);
         Assert.assertEquals("stub", driverConf.getDriverName());
         Assert.assertEquals("org.restcomm.media.resource.asr.StubAsrDriver", driverConf.getClassName());
