@@ -111,13 +111,13 @@ public class XmlConfigurationLoaderTest {
         Assert.assertTrue(subsystems.containsKey("asr"));
         final DriverConfiguration driverConf = subsystems.get("asr");
         Assert.assertNotNull(driverConf);
-        Assert.assertEquals("testdriver", driverConf.getDriverName());
-        Assert.assertEquals("com.restcomm.resources.asr.driver.testdriver", driverConf.getClassName());
+        Assert.assertEquals("stub", driverConf.getDriverName());
+        Assert.assertEquals("org.restcomm.media.resource.asr.StubAsrDriver", driverConf.getClassName());
         final Map<String, String> parameters = driverConf.getParameters();
         Assert.assertNotNull(parameters);
         Assert.assertEquals(1, parameters.size());
-        Assert.assertTrue(parameters.containsKey("testparameter"));
-        Assert.assertEquals("testvalue", parameters.get("testparameter"));
+        Assert.assertTrue(parameters.containsKey("stubName"));
+        Assert.assertEquals("Stub Driver", parameters.get("stubName"));
     }
 
     /**

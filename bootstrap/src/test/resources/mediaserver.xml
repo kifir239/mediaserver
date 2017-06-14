@@ -64,8 +64,8 @@
 
 	<subsystems>
 		<subsystem name="asr">
-			<driver name="testdriver" class="com.restcomm.resources.asr.driver.testdriver">
-				<parameter name="testparameter">testvalue</parameter>
+			<driver name="stub" class="org.restcomm.media.resource.asr.StubAsrDriver">
+				<parameter name="stubName">Stub Driver</parameter>
 			</driver>
 		</subsystem>
 	</subsystems>
