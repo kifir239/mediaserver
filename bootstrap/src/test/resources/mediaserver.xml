@@ -61,4 +61,12 @@
 			TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA, TLS_ECDHE_ECDSA_WITH_AES_256_CBC_SHA</cipherSuites>
 		<certificate path="../conf/dtls/x509-server-ecdsa.pem" key="../conf/dtls/x509-server-key-ecdsa.pem" algorithm="ecdsa"/>
 	</dtls>
+
+	<subsystems>
+		<subsystem name="asr">
+			<driver name="testdriver" class="com.restcomm.resources.asr.driver.testdriver">
+				<parameter name="testparameter">testvalue</parameter>
+			</driver>
+		</subsystem>
+	</subsystems>
 </mediaserver>

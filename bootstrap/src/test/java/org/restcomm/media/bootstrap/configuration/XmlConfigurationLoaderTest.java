@@ -26,15 +26,10 @@ import org.bouncycastle.crypto.tls.ProtocolVersion;
 import org.bouncycastle.crypto.tls.SignatureAlgorithm;
 import org.junit.Assert;
 import org.junit.Test;
-import org.restcomm.media.bootstrap.configuration.XmlConfigurationLoader;
-import org.restcomm.media.core.configuration.DtlsConfiguration;
-import org.restcomm.media.core.configuration.MediaConfiguration;
-import org.restcomm.media.core.configuration.MediaServerConfiguration;
-import org.restcomm.media.core.configuration.MgcpControllerConfiguration;
-import org.restcomm.media.core.configuration.MgcpEndpointConfiguration;
-import org.restcomm.media.core.configuration.NetworkConfiguration;
-import org.restcomm.media.core.configuration.ResourcesConfiguration;
+import org.restcomm.media.core.configuration.*;
 import org.restcomm.media.spi.RelayType;
+
+import java.util.Map;
 
 /**
  * @author Henrique Rosa (henrique.rosa@telestax.com)
@@ -107,6 +102,22 @@ public class XmlConfigurationLoaderTest {
 
         Assert.assertEquals(100, resources.getPlayerCacheSize());
         Assert.assertEquals(true, resources.getPlayerCacheEnabled());
+
+        final SubsystemsConfiguration subsystemsConf = config.getSubsystemsConfiguration();
+        Assert.assertNotNull(subsystemsConf);
+        final Map<String, DriverConfiguration> subsystems = subsystemsConf.getSubsystems();
+        Assert.assertNotNull(subsystems);
+        Assert.assertEquals(1, subsystems.size());
+        Assert.assertTrue(subsystems.containsKey("asr"));
+        final DriverConfiguration driverConf = subsystems.get("asr");
+        Assert.assertNotNull(driverConf);
+        Assert.assertEquals("testdriver", driverConf.getDriverName());
+        Assert.assertEquals("com.restcomm.resources.asr.driver.testdriver", driverConf.getClassName());
+        final Map<String, String> parameters = driverConf.getParameters();
+        Assert.assertNotNull(parameters);
+        Assert.assertEquals(1, parameters.size());
+        Assert.assertTrue(parameters.containsKey("testparameter"));
+        Assert.assertEquals("testvalue", parameters.get("testparameter"));
     }
 
     /**

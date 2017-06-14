@@ -30,13 +30,7 @@ import org.apache.commons.configuration2.ex.ConfigurationException;
 import org.apache.commons.configuration2.ex.ConfigurationRuntimeException;
 import org.apache.commons.configuration2.tree.ImmutableNode;
 import org.apache.log4j.Logger;
-import org.restcomm.media.core.configuration.DtlsConfiguration;
-import org.restcomm.media.core.configuration.MediaConfiguration;
-import org.restcomm.media.core.configuration.MediaServerConfiguration;
-import org.restcomm.media.core.configuration.MgcpControllerConfiguration;
-import org.restcomm.media.core.configuration.MgcpEndpointConfiguration;
-import org.restcomm.media.core.configuration.NetworkConfiguration;
-import org.restcomm.media.core.configuration.ResourcesConfiguration;
+import org.restcomm.media.core.configuration.*;
 
 /**
  * Loads Media Server configurations from an XML file.
@@ -81,6 +75,7 @@ public class XmlConfigurationLoader implements ConfigurationLoader {
         configureMedia(xml.configurationAt("media"), configuration.getMediaConfiguration());
         configureResource(xml.configurationAt("resources"), configuration.getResourcesConfiguration());
         configureDtls(xml.configurationAt("dtls"), configuration.getDtlsConfiguration());
+        configureSubsystems(xml.configurationAt("subsystems"), configuration.getSubsystemsConfiguration());
         return configuration;
     }
 
@@ -152,6 +147,31 @@ public class XmlConfigurationLoader implements ConfigurationLoader {
                 cache.getBoolean("cacheEnabled", ResourcesConfiguration.PLAYER_CACHE_ENABLED),
                 cache.getInt("cacheSize", ResourcesConfiguration.PLAYER_CACHE_SIZE)
         );
+    }
 
+    private static void configureSubsystems(final HierarchicalConfiguration<ImmutableNode> src,
+                                            final SubsystemsConfiguration dst)
+            throws javax.naming.ConfigurationException {
+        final List<HierarchicalConfiguration<ImmutableNode>> subsystems = src.configurationsAt("subsystem");
+        if (subsystems != null) {
+            for (final HierarchicalConfiguration<ImmutableNode> subsystem : subsystems) {
+                if (subsystem != null) {
+                    final String subsystemName = subsystem.getString("[@name]");
+                    final HierarchicalConfiguration<ImmutableNode> driver = subsystem.configurationAt("driver");
+                    final DriverConfiguration driverConf = new DriverConfiguration(driver.getString("[@name]"),
+                            driver.getString("[@class]"));
+                    final List<HierarchicalConfiguration<ImmutableNode>> parameters
+                            = driver.configurationsAt("parameter");
+                    if (parameters != null) {
+                        for (final HierarchicalConfiguration<ImmutableNode> parameter : parameters) {
+                            if (parameter != null) {
+                                driverConf.addParameter(parameter.getString("[@name]"), parameter.getString("."));
+                            }
+                        }
+                        dst.addSubsystem(subsystemName, driverConf);
+                    }
+                }
+            }
+        }
     }
 }
