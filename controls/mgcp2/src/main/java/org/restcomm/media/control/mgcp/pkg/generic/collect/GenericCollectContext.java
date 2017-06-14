@@ -51,6 +51,7 @@ public class GenericCollectContext {
     private int returnCode;
 
     private final Parameters params;
+    private String recognizedText;
 
     public GenericCollectContext(Parameters params) {
         // Signal Options
@@ -469,6 +470,14 @@ public class GenericCollectContext {
         this.noDigitsReprompt.rewind();
         this.successAnnouncement.rewind();
         this.failureAnnouncement.rewind();
+    }
+
+    public void setRecognizedText(String recognizedText) {
+        this.recognizedText = recognizedText;
+    }
+
+    public String getRecognizedText() {
+        return recognizedText;
     }
 
     public static class Parameters {

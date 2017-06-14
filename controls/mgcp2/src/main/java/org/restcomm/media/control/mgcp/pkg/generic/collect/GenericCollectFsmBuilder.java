@@ -96,7 +96,7 @@ public class GenericCollectFsmBuilder {
 
         this.builder.onEntry(GenericCollectState.COLLECTING).callMethod("enterCollecting");
         this.builder.internalTransition().within(GenericCollectState.COLLECTING).on(GenericCollectEvent.DTMF_TONE).callMethod("onCollecting");
-        this.builder.internalTransition().within(GenericCollectState.COLLECTING).on(GenericCollectEvent.RECOGNIZED_TEXT).callMethod("onCollecting");
+        this.builder.internalTransition().within(GenericCollectState.COLLECTING).on(GenericCollectEvent.RECOGNIZED_TEXT).callMethod("onTextRecognized");
         this.builder.transition().from(GenericCollectState.COLLECTING).toFinal(GenericCollectState.COLLECTED).on(GenericCollectEvent.END_INPUT);
         this.builder.onExit(GenericCollectState.COLLECTING).callMethod("exitCollecting");
         

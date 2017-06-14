@@ -156,6 +156,15 @@ public class AsrwgsSignal extends AbstractMgcpSignal {
             final OperationFailed operationFailed = new OperationFailed(PlayCollect.SYMBOL, context.getReturnCode());
             mgcpEventSubject.notify(mgcpEventSubject, operationFailed);
         }
+
+        @Override
+        public void onTextRecognized(GenericCollectState from, GenericCollectState to, GenericCollectEvent event, GenericCollectContext context) {
+            System.out.println("AsrwgsSignal.onTextRecognized: " + context.getRecognizedText() + "; But it will be replaced with 1");
+            final OperationComplete operationComplete = new OperationComplete(PlayCollect.SYMBOL, ReturnCode.SUCCESS.code());
+            operationComplete.setParameter("na", String.valueOf(1));
+            operationComplete.setParameter("dc", "1");
+            mgcpEventSubject.notify(mgcpEventSubject, operationComplete);
+        }
     };
 
     /*private class ParameterParser {

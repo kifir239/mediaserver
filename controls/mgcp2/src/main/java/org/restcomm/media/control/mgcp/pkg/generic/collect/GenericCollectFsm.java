@@ -66,6 +66,8 @@ public interface GenericCollectFsm extends StateMachine<GenericCollectFsm, Gener
 
     void onCollecting(GenericCollectState from, GenericCollectState to, GenericCollectEvent event, GenericCollectContext context);
 
+    void onTextRecognized(GenericCollectState from, GenericCollectState to, GenericCollectEvent event, GenericCollectContext context);
+
     void exitCollecting(GenericCollectState from, GenericCollectState to, GenericCollectEvent event, GenericCollectContext context);
 
     void enterEvaluating(GenericCollectState from, GenericCollectState to, GenericCollectEvent event, GenericCollectContext context);

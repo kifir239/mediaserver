@@ -376,7 +376,13 @@ public class GenericCollectFsmImpl extends
     }
 
     @Override
+    public void onTextRecognized(GenericCollectState from, GenericCollectState to, GenericCollectEvent event, GenericCollectContext context) {
+        extension.onTextRecognized(from, to, event, context);
+    }
+
+    @Override
     public void onCollecting(GenericCollectState from, GenericCollectState to, GenericCollectEvent event, GenericCollectContext context) {
+        System.out.println("On COLLECTING state [digits=" + context.getCollectedDigits() + ", attempt=" + context.getAttempt() + "]");
         if (log.isTraceEnabled()) {
             log.trace(
                     "On COLLECTING state [digits=" + context.getCollectedDigits() + ", attempt=" + context.getAttempt() + "]");
@@ -423,6 +429,15 @@ public class GenericCollectFsmImpl extends
                 this.executor.schedule(new DetectorTimer(context), context.getInterDigitTimer(), TimeUnit.MILLISECONDS);
             }
         }
+    }
+
+    @Override
+    public void fire(GenericCollectEvent event, GenericCollectContext context) {
+        System.out.println("fire event = " + event);
+        if (event == GenericCollectEvent.FAIL) {
+            new RuntimeException().printStackTrace();
+        }
+        super.fire(event, context);
     }
 
     @Override
@@ -704,6 +719,7 @@ public class GenericCollectFsmImpl extends
 
         @Override
         public void onSpeechRecognized(String text) {
+            context.setRecognizedText(text);
             fire(GenericCollectEvent.RECOGNIZED_TEXT, context);
         }
     }
@@ -786,6 +802,8 @@ public class GenericCollectFsmImpl extends
         void enterSucceeded(GenericCollectState from, GenericCollectState to, GenericCollectEvent event, GenericCollectContext context);
 
         void enterFailed(GenericCollectState from, GenericCollectState to, GenericCollectEvent event, GenericCollectContext context);
+
+        void onTextRecognized(GenericCollectState from, GenericCollectState to, GenericCollectEvent event, GenericCollectContext context);
     }
 
 }

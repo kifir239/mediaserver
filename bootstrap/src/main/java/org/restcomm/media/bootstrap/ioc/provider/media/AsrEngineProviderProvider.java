@@ -41,12 +41,12 @@ public class AsrEngineProviderProvider implements Provider<AsrEngineProvider> {
         mng.registerDriver("stub", new AsrDriver() {
 
             private AsrDriverEventListener listener;
-            private long startTime = 0;
+            private long lastEventTime = 0;
 
             @Override
             public void startRecognizing(String lang) {
                 System.out.println("!!! startRecognizing");
-                startTime = System.currentTimeMillis();
+                lastEventTime = System.currentTimeMillis();
             }
 
             @Override
@@ -56,9 +56,10 @@ public class AsrEngineProviderProvider implements Provider<AsrEngineProvider> {
 
             @Override
             public void write(byte[] data, int offset, int len) {
-                System.out.println("!!! write byte[]: " + (System.currentTimeMillis() - startTime));
-                if (System.currentTimeMillis() - startTime > 2000 && listener != null) {
-                    listener.onSpeechRecognized("stubtext");
+                System.out.println("!!! write byte[]: " + (System.currentTimeMillis() - lastEventTime));
+                if (System.currentTimeMillis() - lastEventTime > 5000 && listener != null) {
+                    lastEventTime = System.currentTimeMillis();
+                    listener.onSpeechRecognized("1");
                 }
             }
 
