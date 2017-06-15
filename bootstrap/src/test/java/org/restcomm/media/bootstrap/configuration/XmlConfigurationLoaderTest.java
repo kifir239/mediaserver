@@ -29,6 +29,7 @@ import org.junit.Test;
 import org.restcomm.media.core.configuration.*;
 import org.restcomm.media.spi.RelayType;
 
+import java.util.Collection;
 import java.util.Map;
 
 /**
@@ -105,15 +106,29 @@ public class XmlConfigurationLoaderTest {
 
         final SubsystemsConfiguration subsystemsConf = config.getSubsystemsConfiguration();
         Assert.assertNotNull(subsystemsConf);
-        final DriverConfiguration driverConf = subsystemsConf.getDriverConfiguration("asr");
-        Assert.assertNotNull(driverConf);
-        Assert.assertEquals("stub", driverConf.getDriverName());
-        Assert.assertEquals("org.restcomm.media.resource.asr.StubAsrDriver", driverConf.getClassName());
-        final Map<String, String> parameters = driverConf.getParameters();
-        Assert.assertNotNull(parameters);
-        Assert.assertEquals(1, parameters.size());
-        Assert.assertTrue(parameters.containsKey("stubName"));
-        Assert.assertEquals("Stub Driver", parameters.get("stubName"));
+        final Collection<DriverConfiguration> drivers = subsystemsConf.getDrivers("asr");
+        Assert.assertNotNull(drivers);
+        Assert.assertEquals(2, drivers.size());
+        {
+            final DriverConfiguration driver = subsystemsConf.getDriver("asr", "stub");
+            Assert.assertEquals("stub", driver.getDriverName());
+            Assert.assertEquals("org.restcomm.media.resource.asr.StubAsrDriver", driver.getClassName());
+            final Map<String, String> parameters = driver.getParameters();
+            Assert.assertNotNull(parameters);
+            Assert.assertEquals(1, parameters.size());
+            Assert.assertTrue(parameters.containsKey("stubName"));
+            Assert.assertEquals("Stub Driver", parameters.get("stubName"));
+        }
+        {
+            final DriverConfiguration driver = subsystemsConf.getDriver("asr", "stub2");
+            Assert.assertEquals("stub2", driver.getDriverName());
+            Assert.assertEquals("org.restcomm.media.resource.asr.StubAsrDriver2", driver.getClassName());
+            final Map<String, String> parameters = driver.getParameters();
+            Assert.assertNotNull(parameters);
+            Assert.assertEquals(1, parameters.size());
+            Assert.assertTrue(parameters.containsKey("stubName2"));
+            Assert.assertEquals("Stub Driver 2", parameters.get("stubName2"));
+        }
     }
 
     /**

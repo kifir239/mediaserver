@@ -67,6 +67,9 @@
 			<driver name="stub" class="org.restcomm.media.resource.asr.StubAsrDriver">
 				<parameter name="stubName">Stub Driver</parameter>
 			</driver>
+			<driver name="stub2" class="org.restcomm.media.resource.asr.StubAsrDriver2">
+				<parameter name="stubName2">Stub Driver 2</parameter>
+			</driver>
 		</subsystem>
 	</subsystems>
 </mediaserver>

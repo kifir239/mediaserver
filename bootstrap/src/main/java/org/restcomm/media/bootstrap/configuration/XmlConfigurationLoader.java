@@ -154,21 +154,29 @@ public class XmlConfigurationLoader implements ConfigurationLoader {
             throws javax.naming.ConfigurationException {
         final List<HierarchicalConfiguration<ImmutableNode>> subsystems = src.configurationsAt("subsystem");
         if (subsystems != null) {
-            for (final HierarchicalConfiguration<ImmutableNode> subsystem : subsystems) {
+            for (final HierarchicalConfiguration<ImmutableNode> subsystem: subsystems) {
                 if (subsystem != null) {
                     final String subsystemName = subsystem.getString("[@name]");
-                    final HierarchicalConfiguration<ImmutableNode> driver = subsystem.configurationAt("driver");
-                    final DriverConfiguration driverConf = new DriverConfiguration(driver.getString("[@name]"),
-                            driver.getString("[@class]"));
-                    final List<HierarchicalConfiguration<ImmutableNode>> parameters
-                            = driver.configurationsAt("parameter");
-                    if (parameters != null) {
-                        for (final HierarchicalConfiguration<ImmutableNode> parameter : parameters) {
-                            if (parameter != null) {
-                                driverConf.addParameter(parameter.getString("[@name]"), parameter.getString("."));
+                    final SubsystemConfiguration subsystemConf
+                            = new SubsystemConfiguration(subsystemName);
+                    final List<HierarchicalConfiguration<ImmutableNode>> drivers = subsystem.configurationsAt("driver");
+                    if (drivers != null) {
+                        for (final HierarchicalConfiguration<ImmutableNode> driver: drivers) {
+                            final String driverName = driver.getString("[@name]");
+                            final DriverConfiguration driverConf = new DriverConfiguration(driverName,
+                                    driver.getString("[@class]"));
+                            final List<HierarchicalConfiguration<ImmutableNode>> parameters
+                                    = driver.configurationsAt("parameter");
+                            if (parameters != null) {
+                                for (final HierarchicalConfiguration<ImmutableNode> parameter : parameters) {
+                                    if (parameter != null) {
+                                        driverConf.addParameter(parameter.getString("[@name]"), parameter.getString("."));
+                                    }
+                                }
                             }
+                            subsystemConf.addDriver(driverName, driverConf);
                         }
-                        dst.addSubsystem(subsystemName, driverConf);
+                        dst.addSubsystem(subsystemName, subsystemConf);
                     }
                 }
             }
