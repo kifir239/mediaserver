@@ -21,9 +21,6 @@
 
 package org.restcomm.media.control.mgcp.endpoint;
 
-import javax.sound.sampled.spi.AudioFileReader;
-
-import org.restcomm.media.ComponentType;
 import org.restcomm.media.component.audio.AudioComponent;
 import org.restcomm.media.component.oob.OOBComponent;
 import org.restcomm.media.resource.asr.AsrEngine;

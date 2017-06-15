@@ -42,8 +42,6 @@ import org.mockito.ArgumentCaptor;
 import org.restcomm.media.control.mgcp.pkg.MgcpEvent;
 import org.restcomm.media.control.mgcp.pkg.MgcpEventObserver;
 import org.restcomm.media.control.mgcp.pkg.au.ReturnCode;
-import org.restcomm.media.control.mgcp.pkg.au.pc.PlayCollect;
-import org.restcomm.media.resource.asr.AsrEngine;
 import org.restcomm.media.resource.dtmf.DtmfEventImpl;
 import org.restcomm.media.resource.player.audio.AudioPlayerEvent;
 import org.restcomm.media.resource.player.audio.AudioPlayerImpl;
