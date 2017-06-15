@@ -3,6 +3,7 @@ package org.restcomm.media.resource.asr;
 import org.restcomm.media.resource.asr.api.AsrDriver;
 
 import java.nio.ByteBuffer;
+import java.util.Map;
 
 /**
  * Created by anikiforov on 6/15/2017.
@@ -10,6 +11,11 @@ import java.nio.ByteBuffer;
 public class StubAsrDriver implements AsrDriver {
     private AsrDriverEventListener listener;
     private long lastEventTime = 0;
+
+    @Override
+    public void configure(Map<String, String> parameters) {
+        System.out.println("!!! configure");
+    }
 
     @Override
     public void startRecognizing(String lang) {

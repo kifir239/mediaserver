@@ -49,6 +49,7 @@ public class AsrEngineProviderProvider implements Provider<AsrEngineProvider> {
                 try {
                     final Class<?> clazz = Class.forName(className);
                     final AsrDriver object = (AsrDriver) clazz.newInstance();
+                    object.configure(driver.getParameters());
                     mng.registerDriver(driverName, object);
                     logger.info("Driver \'" + driverName + "' (" + className + ") is successfully registered");
                 } catch (final ClassNotFoundException | InstantiationException | IllegalAccessException e) {
