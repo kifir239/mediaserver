@@ -1,4 +1,4 @@
-package org.restcomm.media.resource.asr;
+package org.restcomm.media.resource.asr.api;
 
 import java.nio.ByteBuffer;
 

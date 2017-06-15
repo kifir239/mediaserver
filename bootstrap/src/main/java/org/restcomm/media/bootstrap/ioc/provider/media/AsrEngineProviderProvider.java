@@ -7,6 +7,7 @@ import org.restcomm.media.core.configuration.DriverConfiguration;
 import org.restcomm.media.core.configuration.MediaServerConfiguration;
 import org.restcomm.media.core.configuration.SubsystemsConfiguration;
 import org.restcomm.media.resource.asr.*;
+import org.restcomm.media.resource.asr.api.AsrDriver;
 import org.restcomm.media.scheduler.PriorityQueueScheduler;
 
 import java.util.Collection;

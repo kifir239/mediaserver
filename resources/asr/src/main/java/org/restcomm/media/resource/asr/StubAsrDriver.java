@@ -1,5 +1,7 @@
 package org.restcomm.media.resource.asr;
 
+import org.restcomm.media.resource.asr.api.AsrDriver;
+
 import java.nio.ByteBuffer;
 
 /**
