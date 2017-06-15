@@ -19,5 +19,6 @@ public interface AsrDriver {
 
     interface AsrDriverEventListener {
         void onSpeechRecognized(String text);
+        void onError(final AsrError error, final String description);
     }
 }

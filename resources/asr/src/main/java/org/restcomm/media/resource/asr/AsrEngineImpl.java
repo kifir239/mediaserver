@@ -4,6 +4,7 @@ import org.restcomm.media.ComponentType;
 import org.restcomm.media.component.AbstractSink;
 import org.restcomm.media.component.audio.AudioOutput;
 import org.restcomm.media.resource.asr.api.AsrDriver;
+import org.restcomm.media.resource.asr.api.AsrError;
 import org.restcomm.media.scheduler.PriorityQueueScheduler;
 import org.restcomm.media.scheduler.Task;
 import org.restcomm.media.spi.memory.Frame;
@@ -116,6 +117,10 @@ public class AsrEngineImpl extends AbstractSink implements AsrEngine, PooledObje
         @Override
         public void onSpeechRecognized(String text) {
             fireEvent(text);
+        }
+
+        @Override
+        public void onError(final AsrError error, final String description) {
         }
     };
 }
